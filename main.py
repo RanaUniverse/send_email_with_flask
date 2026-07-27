@@ -1,4 +1,6 @@
 from flask import Flask
+
+
 from app.config import settings
 
 from app.features.general.routes import general_bp

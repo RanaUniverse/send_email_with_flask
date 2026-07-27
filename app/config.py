@@ -27,6 +27,7 @@ class AppSettings(BaseModel):
 
     host: str = "0.0.0.0"
     port: int = 9999
+    debug: bool = False
     secret_key: SecretStr
 
 

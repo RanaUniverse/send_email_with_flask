@@ -9,16 +9,19 @@
         Send Email To Customers
         {% endblock %}
     </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css' ) }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/icons/bootstrap-icons.min.css' ) }}">
+    {% include 'partials/_assets_css.html' %}
 </head>
 
 <body>
-    <h1>
-        Thanks
-    </h1>
-    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js' ) }}">
-    </script>
+    <header>
+        {%- include 'partials/_navbar.html' -%}
+    </header>
+
+    {% block content %}
+    {% endblock %}
+
+    {% include 'partials/_footer.html' %}
+    {% include 'partials/_assets_js.html' %}
 </body>
 
 </html>

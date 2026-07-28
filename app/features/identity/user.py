@@ -24,6 +24,10 @@ class User(UserMixin):
         self.balance = balance
         self.password = password
 
+    def get_id(self):
+
+        return str(self.id_)
+
 
 USER_: dict[str, User] = {
     "1": User(

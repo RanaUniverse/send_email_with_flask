@@ -11,3 +11,5 @@ wheels/
 
 
 .env
+# This below will have some my own learning files
+z*

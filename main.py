@@ -4,6 +4,7 @@ from flask import Flask
 from app.config import settings
 
 from app.features.general.routes import general_bp
+from app.features.identity.routes import auth_bp
 
 from app.shared.extensions import login_manager
 
@@ -20,6 +21,7 @@ def create_app() -> Flask:
     app.secret_key = settings.app.secret_key.get_secret_value()
 
     app.register_blueprint(blueprint=general_bp)
+    app.register_blueprint(blueprint=auth_bp)
 
     return app
 

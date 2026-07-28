@@ -1,0 +1,64 @@
+{#
+app/features/identity/templates/auth/login.html
+
+Here i will shows the login page to user
+#}
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Let's Login Here</h1>
+
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6 col-lg-5">
+
+        <div class="card shadow border-0 mt-5">
+
+            <div class="card-body p-4">
+
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-person-circle"></i>
+                    Login
+                </h2>
+
+                <form method="POST">
+
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control", placeholder="Enter your email") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+
+                </form>
+
+                <hr>
+
+                <p class="text-center mb-0">
+                    Don't have an account?
+                    <a href="{{ url_for('auth_bp.register') }}">
+                        Register here
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

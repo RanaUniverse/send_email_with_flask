@@ -61,7 +61,10 @@ def login():
                 message="Wrong Credentials",
                 category="warning",
             )
-            return redirect(url_for("auth_bp.login"))
+            return render_template(
+                template_name_or_list="auth/login.html",
+                form=form,
+            ), 401
 
     return render_template(
         template_name_or_list="auth/login.html",

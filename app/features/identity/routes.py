@@ -6,12 +6,19 @@ Here i will keep login related things
 
 from flask import (
     Blueprint,
+    flash,
     render_template,
     # request,
-    # redirect,
-    # url_for,
+    redirect,
+    url_for,
 )
-from flask_login import login_user  # type: ignore
+
+
+from flask_login import (  # type: ignore
+    login_required,  # type: ignore
+    login_user,  # type: ignore
+    logout_user,
+)
 
 # this below is the demo database
 
@@ -44,14 +51,33 @@ def login():
 
         if user_obj:
             login_user(user=user_obj)
-            return "Login successfull"
+            flash(
+                message="Login Successful",
+                category="success",
+            )
+            return redirect(url_for("general_bp.home_page"))
         else:
-            return "Login Fails"
+            flash(
+                message="Wrong Credentials",
+                category="warning",
+            )
+            return redirect(url_for("auth_bp.login"))
 
     return render_template(
         template_name_or_list="auth/login.html",
         form=form,
     )
+
+
+@auth_bp.route(rule="/logout")
+@login_required
+def logout():
+    logout_user()
+    flash(
+        message="You have been logout goodly",
+        category="danger",
+    )
+    return redirect(location=url_for("general_bp.home_page"))
 
 
 @auth_bp.route(rule="/register", methods=["GET", "POST"])

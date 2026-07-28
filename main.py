@@ -6,7 +6,7 @@ from app.config import settings
 from app.features.general.routes import general_bp
 from app.features.identity.routes import auth_bp
 
-from app.shared.extensions import login_manager
+from app.shared.extensions import login_manager, csrf
 
 
 def create_app() -> Flask:
@@ -15,6 +15,9 @@ def create_app() -> Flask:
     )
 
     login_manager.init_app(  # type: ignore
+        app=app,
+    )
+    csrf.init_app(  # type: ignore
         app=app,
     )
 

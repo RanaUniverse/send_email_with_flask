@@ -24,7 +24,7 @@ Here i will shows the login page to user
                     Login
                 </h2>
 
-                <form method="POST">
+                <form method="POST" action="{{ url_for('auth_bp.login' ) }}">
 
                     {{ form.hidden_tag() }}
 

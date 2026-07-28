@@ -17,8 +17,10 @@
         {%- include 'partials/_navbar.html' -%}
     </header>
 
-    {% block content %}
-    {% endblock %}
+    <main class="flex-grow-1">
+        {% block content %}
+        {% endblock %}
+    </main>
 
     {% include 'partials/_footer.html' %}
     {% include 'partials/_assets_js.html' %}

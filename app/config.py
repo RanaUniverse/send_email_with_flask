@@ -5,7 +5,7 @@ This will be store the configuration settings here
 """
 
 from functools import lru_cache
-
+from typing import Literal
 
 from pydantic import (
     BaseModel,
@@ -38,11 +38,14 @@ class MailSettings(BaseModel):
     and from email is my email id other will see
     """
 
+    provider: Literal["local", "smtp"]
+    # how i can say it value wil lonly, "local" or "smtp"
+
     host: str
     port: int
     username: str
     password: SecretStr
-    from_email: EmailStr
+    from_email_default: EmailStr
 
 
 class Settings(BaseSettings):

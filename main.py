@@ -3,8 +3,9 @@ from flask import Flask
 
 from app.config import settings
 
-from app.features.general.routes import general_bp
 from app.features.identity.routes import auth_bp
+from app.features.general.routes import general_bp
+from app.features.mail.routes import mail_bp
 
 from app.shared.extensions import login_manager, csrf
 
@@ -23,8 +24,9 @@ def create_app() -> Flask:
 
     app.secret_key = settings.app.secret_key.get_secret_value()
 
-    app.register_blueprint(blueprint=general_bp)
     app.register_blueprint(blueprint=auth_bp)
+    app.register_blueprint(blueprint=general_bp)
+    app.register_blueprint(blueprint=mail_bp)
 
     return app
 

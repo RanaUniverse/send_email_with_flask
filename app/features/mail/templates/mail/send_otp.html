@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="text-center mb-2">Verify Your Email</h2>
+
+<p class="text-center text-muted">
+    Enter your email address to receive a one-time password (OTP).
+</p>
+
+<div class="container py-5 border border-danger">
+    <form action="{{ url_for('mail_bp.otp_send' ) }}" method="post">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3 text-center">
+            {{ form.email.label }}
+            <br>
+            {{ form.email() }}
+        </div>
+
+        <div class="mb-3">
+            {{form.submit(class="btn btn-primary w-100 py-2 mb-3")}}
+        </div>
+
+
+    </form>
+
+</div>
+
+
+{% endblock %}

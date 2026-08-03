@@ -21,4 +21,5 @@ email_config = AuthSMTPConfig(
     port=settings.mail.port,
     username=settings.mail.username,
     password=settings.mail.password.get_secret_value(),
+    security=settings.mail.security,
 )

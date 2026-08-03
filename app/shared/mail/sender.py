@@ -1,5 +1,5 @@
 """
-app/shared/email/sender.py
+app/shared/mail/sender.py
 
 
 """
@@ -16,7 +16,6 @@ from .models import (
     EmailMessageData,
 )
 from .email_builder import build_email_message
-
 
 
 class EmailSender(Protocol):

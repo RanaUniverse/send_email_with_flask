@@ -1,5 +1,5 @@
 """
-app/shared/email/factory.py
+app/shared/mail/factory.py
 
 This will make my email service of what to use in my all
 the places, it will create the service properly here which i will use

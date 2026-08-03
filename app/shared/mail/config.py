@@ -1,5 +1,5 @@
 """
-app/shared/email/config.py
+app/shared/mail/config.py
 
 Here i will make email related conig settings below
 which i will use in different places

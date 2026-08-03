@@ -1,5 +1,5 @@
 """
-app/shared/email/models.py
+app/shared/mail/models.py
 
 """
 

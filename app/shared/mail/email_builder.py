@@ -1,5 +1,5 @@
 """
-app/shared/email/email_builder.py
+app/shared/mail/email_builder.py
 
 This will make the email content here and i will pass this
 in my sender or others so that it will use easily

@@ -8,10 +8,10 @@ or what to validate or not i will call the operations.py
 from pydantic import EmailStr
 
 
-from app.shared.email.models import EmailMessageData
+from app.shared.mail.models import EmailMessageData
 
-from app.shared.email.sender import EmailSender
-from app.shared.email.factory import mail_sender
+from app.shared.mail.sender import EmailSender
+from app.shared.mail.factory import mail_sender
 
 
 class MailService:

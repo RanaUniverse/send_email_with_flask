@@ -55,7 +55,7 @@ class LocalMailSender:
             )
 
 
-class AuthenticatedSMTPSender:
+class SMTPMailSender:
 
     def __init__(
         self,

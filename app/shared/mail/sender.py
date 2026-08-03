@@ -19,6 +19,7 @@ from .models import (
     EmailMessageData,
 )
 from .email_builder import build_email_message
+from .exceptions import EmailSendError
 
 
 class EmailSender(Protocol):
@@ -69,7 +70,7 @@ class SMTPMailSender:
         self,
         context: ssl.SSLContext,
         msg: EmailMessage,
-    ):
+    ) -> None:
         with smtplib.SMTP_SSL(
             host=self.config.host,
             port=self.config.port,
@@ -87,7 +88,7 @@ class SMTPMailSender:
         self,
         context: ssl.SSLContext,
         msg: EmailMessage,
-    ):
+    ) -> None:
 
         with smtplib.SMTP(
             host=self.config.host,
@@ -116,18 +117,30 @@ class SMTPMailSender:
         )
         context = ssl.create_default_context()
 
-        if self.config.security == "ssl":
-            self._send_over_ssl(
-                context=context,
-                msg=msg,
-            )
-        elif self.config.security == "starttls":
-            self._send_over_starttls(
-                context=context,
-                msg=msg,
-            )
+        try:
 
-        else:
-            raise ValueError(
-                "Unsupported SMTP Security Mode",
-            )
+            if self.config.security == "ssl":
+                self._send_over_ssl(
+                    context=context,
+                    msg=msg,
+                )
+            elif self.config.security == "starttls":
+                self._send_over_starttls(
+                    context=context,
+                    msg=msg,
+                )
+
+            else:
+                raise ValueError(
+                    f"Unsupported SMTP Security Mode: {self.config.security}",
+                )
+
+        except smtplib.SMTPException as e:
+            raise EmailSendError(
+                "Unable to connect to email server",
+            ) from e
+
+        except Exception as e:
+            raise EmailSendError(
+                "Different Problem",
+            ) from e

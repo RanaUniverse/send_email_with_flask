@@ -46,6 +46,10 @@ class MailSettings(BaseModel):
     username: str
     password: SecretStr
     from_email_default: EmailStr
+    security: Literal[
+        "ssl",
+        "starttls",
+    ]
 
 
 class Settings(BaseSettings):

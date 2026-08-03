@@ -3,6 +3,9 @@ app/shared/email/models.py
 
 """
 
+from typing import Literal
+
+
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 
@@ -14,6 +17,11 @@ class SMTPConfig(BaseModel):
 class AuthSMTPConfig(SMTPConfig):
     username: str
     password: str
+
+    security: Literal[
+        "ssl",
+        "starttls",
+    ]
 
 
 class EmailMessageData(BaseModel):

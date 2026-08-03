@@ -51,46 +51,6 @@ def send_otp_to_email(to_email: str):
     )
 
 
-# def send_otp_to_email_old(
-#     to_email: str,
-# ):
-#     """
-#     This is my business logic this fun will call in the routes.py
-#     here i will deceide what protocle and what msg i will send
-#     and how i will do it by the email sending way
-
-#     Now this is generating otp, msg body later i will separate this in
-#     differnet module and just call the sender.send_mail
-#     """
-
-#     # it will create a random secret number in reality
-#     otp = 123456
-
-#     msg_body = f"Hello User, your otp for veification is: {otp}, valid for 60 seconds."
-
-#     mail_data = EmailMessageData(
-#         to_email=[to_email, "x@co.m"],
-#         subject="OTP SENDING",
-#         body=msg_body,
-#     )
-#     # below will some logic to from where the mail will send
-#     # mail_data.from_email = "user_own@gmail.com"
-
-#     local = LocalMailSender(
-#         local_config=local_config,
-#     )
-#     local.send_mail(
-#         email_msg=mail_data,
-#     )
-
-#     # gmail = GmailSender(
-#     #     gmail_config=gmail_config,
-#     # )
-#     # gmail.send_mail(
-#     #     email_msg=mail_data,
-#     # )
-
-
 def send_email_to_one_user():
     """
     This will just Send the mail to the user or whatsoever

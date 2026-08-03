@@ -30,10 +30,10 @@ class EmailSender(Protocol):
 class LocalMailSender:
     def __init__(
         self,
-        local_config: SMTPConfig,
+        mail_config: SMTPConfig,
         default_from: EmailStr,
     ) -> None:
-        self.config = local_config
+        self.config = mail_config
         self.default_from = default_from
 
     def send_mail(
@@ -53,14 +53,14 @@ class LocalMailSender:
             )
 
 
-class GmailSender:
+class AuthenticatedSMTPSender:
 
     def __init__(
         self,
-        gmail_config: AuthSMTPConfig,
+        mail_config: AuthSMTPConfig,
         default_from: EmailStr,
     ) -> None:
-        self.config = gmail_config
+        self.config = mail_config
         self.default_from = default_from
 
     def send_mail(

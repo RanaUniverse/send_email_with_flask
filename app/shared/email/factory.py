@@ -8,7 +8,7 @@ to send mail to other user.
 
 from app.config import settings
 from .config import local_config, email_config
-from .sender import EmailSender, LocalMailSender, GmailSender
+from .sender import EmailSender, LocalMailSender, AuthenticatedSMTPSender
 
 
 def get_mail_sender() -> EmailSender:
@@ -17,14 +17,14 @@ def get_mail_sender() -> EmailSender:
     """
     if settings.mail.provider == "local":
         s = LocalMailSender(
-            local_config=local_config,
+            mail_config=local_config,
             default_from=settings.mail.from_email_default,
         )
         return s
 
     elif settings.mail.provider == "smtp":
-        s = GmailSender(
-            gmail_config=email_config,
+        s = AuthenticatedSMTPSender(
+            mail_config=email_config,
             default_from=settings.mail.from_email_default,
         )
         return s

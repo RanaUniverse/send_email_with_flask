@@ -51,6 +51,17 @@ class MailSettings(BaseModel):
         "starttls",
     ]
 
+    reply_to_default: EmailStr | None = None
+    reply_to_billing: EmailStr | None = None
+    reply_to_otp: EmailStr | None = None
+    reply_to_support: EmailStr | None = None
+    reply_to_sales: EmailStr | None = None
+    reply_to_security: EmailStr | None = None
+    reply_to_account: EmailStr | None = None
+    reply_to_jobs: EmailStr | None = None
+    reply_to_login: EmailStr | None = None
+    reply_to_welcome: EmailStr | None = None
+
 
 class Settings(BaseSettings):
     owner_name: str

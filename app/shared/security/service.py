@@ -14,6 +14,7 @@ from app.shared.mail.sender import EmailSender
 from app.shared.security.otp_generate import OTPGenerator
 
 from app.shared.security.otp_templates import otp_email_body
+from app.config import settings
 
 
 class OTPService:
@@ -43,8 +44,11 @@ class OTPService:
             to_email=[
                 email_to,
             ],
-            subject="Vefify Your OTP",
+            subject="Vefify Your OTP- Rana Universe",
             body=body,
+            reply_to=(
+                settings.mail.reply_to_otp or settings.mail.reply_to_default or None
+            ),
         )
 
         self.sender.send_mail(

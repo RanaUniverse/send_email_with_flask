@@ -14,6 +14,10 @@ from app.shared.mail.sender import EmailSender
 from app.shared.mail.factory import mail_sender
 
 
+from app.shared.security.otp_generate import generate_otp
+from app.shared.security.otp_templates import otp_email_body
+
+
 class MailService:
     def __init__(
         self,
@@ -26,15 +30,15 @@ class MailService:
         to_email: EmailStr,
     ):
         # this otp generate will be done in another fun
-        random_otp = 123456
-        msg_body = (
-            f"Hello User, your otp for veification is: {random_otp}, "
-            "valid for 60 seconds."
+
+        msg_body = otp_email_body(
+            otp=generate_otp(),
+            valid_seconds=100,
         )
 
         mail_data = EmailMessageData(
-            to_email=[to_email, "x@co.m"],
-            subject="OTP SENDING",
+            to_email=[to_email],
+            subject="Verify Your OTP- Rana Universe",
             body=msg_body,
         )
         self.sender.send_mail(

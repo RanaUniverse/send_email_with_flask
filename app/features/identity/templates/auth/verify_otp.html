@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Register OTP Verification{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -13,25 +13,22 @@
 
                 <h2 class="text-center mb-4">
                     <i class="bi bi-person-plus-fill"></i>
-                    Create Account
+                    Verify OTP
+                    <br>
+                    <!-- #TODO -->
+                    Assume OTP: 123456
                 </h2>
 
-                <form action="{{ url_for('auth_bp.register' ) }}" method="post">
+
+                <p>OTP has been sent to {{ email }}</p>
+
+                <form method="POST">
                     {{ form.hidden_tag() }}
-                    <p>
-                        OTP Will Go To The Below Email ID:
-                    </p>
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control", placeholder="Enter your email") }}
-                    </div>
 
+                    {{ form.otp.label }}
+                    {{ form.otp() }}
 
-                    <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
-
-
+                    {{ form.submit() }}
                 </form>
 
                 <hr>

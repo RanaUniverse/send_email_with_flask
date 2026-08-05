@@ -10,15 +10,16 @@ from flask_wtf import (  # type: ignore
 
 from wtforms import (
     PasswordField,
-    StringField,
     SubmitField,
+    StringField,
+    EmailField,
 )
 
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Email
 
 
-class LoginForm(FlaskForm):
-    email = StringField(
+class EmailMixin:
+    email = EmailField(
         label="Email ID",
         validators=[
             DataRequired(),
@@ -26,8 +27,25 @@ class LoginForm(FlaskForm):
                 min=1,
                 max=50,
             ),
+            Email(),
         ],
     )
+    # i use below sometime to check if frontend fails to email id check i will
+    # check with below valud if my backend will do it properly
+    
+    # email = StringField(
+    #     label="Email ID",
+    #     validators=[
+    #         DataRequired(),
+    #         Length(
+    #             min=1,
+    #             max=50,
+    #         ),
+    #     ],
+    # )
+
+
+class LoginForm(FlaskForm, EmailMixin):
 
     password = PasswordField(
         label="Enter Your Password",
@@ -41,10 +59,23 @@ class LoginForm(FlaskForm):
     )
 
 
-class RegisterForm(FlaskForm):
-    """
-    # TODO
-    I will make this later
-    """
+class RegisterForm(FlaskForm, EmailMixin):
+    submit = SubmitField(
+        label="Register New Account",
+    )
 
-    ...
+
+class OTPForm(FlaskForm):
+    otp = StringField(
+        label="Enter OTP",
+        validators=[
+            DataRequired(),
+            Length(
+                min=6,
+                max=6,
+            ),
+        ],
+    )
+    submit = SubmitField(
+        label="Verify Your OTP",
+    )

@@ -5,9 +5,7 @@ Here i will keep the business logic of what to do
 or what to validate or not i will call the operations.py
 """
 
-from app.shared.mail.factory import mail_sender
-
-from app.shared.mail.factory import mail_sender
+from app.shared.mail.factory import mail_sender_obj
 from app.shared.security.service import OTPService
 
 from app.shared.security.factory import otp_generator_obj
@@ -19,7 +17,7 @@ def send_otp_to_email(to_email: str):
     and then pass to db and so on
     """
     # first i will decide what mail sender to use like my otp or general or what
-    sender = mail_sender
+    sender = mail_sender_obj
     otp_generator = otp_generator_obj
 
     o = OTPService(

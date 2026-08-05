@@ -32,4 +32,4 @@ def get_mail_sender() -> EmailSender:
         raise ValueError("EmailSender Not Created Successfully.")
 
 
-mail_sender = get_mail_sender()
+mail_sender_obj = get_mail_sender()

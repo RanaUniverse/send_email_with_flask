@@ -11,6 +11,7 @@ from flask import (
     # request,
     redirect,
     url_for,
+    session,
 )
 
 
@@ -20,11 +21,10 @@ from flask_login import (  # type: ignore
     logout_user,
 )
 
-# this below is the demo database
 
-from .services import check_authentication
-
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm, OTPForm
+from .services import check_authentication, start_regisration
+from .exceptions import InvalidEmailError
 
 auth_bp = Blueprint(
     name="auth_bp",
@@ -61,10 +61,13 @@ def login():
                 message="Wrong Credentials",
                 category="warning",
             )
-            return render_template(
-                template_name_or_list="auth/login.html",
-                form=form,
-            ), 401
+            return (
+                render_template(
+                    template_name_or_list="auth/login.html",
+                    form=form,
+                ),
+                401,
+            )
 
     return render_template(
         template_name_or_list="auth/login.html",
@@ -83,11 +86,91 @@ def logout():
     return redirect(location=url_for("general_bp.home_page"))
 
 
-@auth_bp.route(rule="/register", methods=["GET", "POST"])
+@auth_bp.route(
+    rule="/register",
+    methods=["GET", "POST"],
+)
 def register():
     """
     this page is for showing registerariotn page
     """
+    form = RegisterForm()
+
+    if form.validate_on_submit():  # type: ignore
+
+        try:
+            start_regisration(email=form.email.data or "")
+        except InvalidEmailError as e:
+            flash(
+                message=str(e),
+                category="danger",
+            )
+            return render_template(
+                "auth/register.html",
+                form=form,
+            )
+
+        session["pending_email"] = "xxx"
+
+        flash(
+            message="OTP sent successfully.",
+            category="success",
+        )
+
+        return redirect(url_for("auth_bp.verify_otp"))
+
+        # i wnat to send otp if the email is right where i shoudl to do i wnat to use ddd and how?
+
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(
+                    message=f"{field.upper()}: {error}",
+                    category="danger",
+                )
+
     return render_template(
         template_name_or_list="auth/register.html",
+        form=form,
+    )
+
+
+@auth_bp.route(
+    "/verify-otp",
+    methods=["GET", "POST"],
+)
+def verify_otp():
+
+    email = session.get("pending_email")
+
+    if email is None:
+        return redirect(url_for("auth_bp.register"))
+
+    form = OTPForm()
+
+    if form.validate_on_submit():  # type: ignore
+
+        otp = form.otp.data or ""
+
+        # call your OTPService here
+
+        if otp == "123456":
+            flash(
+                "OTP verified successfully.",
+                "success",
+            )
+
+            session.pop("pending_email", None)
+
+            return redirect(url_for("general_bp.home_page"))
+
+        flash(
+            "Invalid OTP",
+            "danger",
+        )
+
+    return render_template(
+        "auth/verify_otp.html",
+        form=form,
+        email=email,
     )

@@ -22,13 +22,20 @@ def build_email_message(
     Here i will pass my pydantic class
     and it will make this python inbuild EmailMessage
     so that i can use this in server.send_message
+
+    The email sender will call this before sending a mail
     """
     msg = EmailMessage()
     msg["From"] = str(email_msg.from_email or default_from_email)
     msg["To"] = email_msg.to_email
     msg["Subject"] = email_msg.subject
-    msg.set_content(email_msg.body)
+    msg.set_content(email_msg.body_text)
 
+    if email_msg.body_html:
+        msg.add_alternative(
+            email_msg.body_html,
+            subtype="html",
+        )
     if email_msg.cc:
         msg["Cc"] = email_msg.cc
     if email_msg.bcc:

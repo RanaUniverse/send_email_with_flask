@@ -33,7 +33,8 @@ class EmailMessageData(BaseModel):
     to_email: list[EmailStr]
 
     subject: str
-    body: str
+    body_text: str
+    body_html: str | None = None
 
     from_email: EmailStr | None = None
     # if i will not use this upper value it will use from config

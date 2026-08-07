@@ -22,9 +22,13 @@ from flask_login import (  # type: ignore
 )
 
 
-from .forms import LoginForm, RegisterForm, OTPForm
-from .services import check_authentication, start_regisration
 from .exceptions import InvalidEmailError
+from .forms import LoginForm, RegisterForm, OTPForm
+from .services.otp import verify_otp_service
+from .services.services import check_authentication, start_regisration
+
+# TODO  i will later change this to call the service which will call the otp
+
 
 auth_bp = Blueprint(
     name="auth_bp",
@@ -99,7 +103,8 @@ def register():
     if form.validate_on_submit():  # type: ignore
 
         try:
-            start_regisration(email=form.email.data or "")
+            register = start_regisration(email=form.email.data or "")
+
         except InvalidEmailError as e:
             flash(
                 message=str(e),
@@ -110,7 +115,16 @@ def register():
                 form=form,
             )
 
-        session["pending_email"] = "xxx"
+        # TODO later i will add a step if mail server down or somethign so that i can
+        # shows to use another way like this based on this
+        if not register:
+            flash(
+                message="Email Server Down",
+                category="error",
+            )
+            return redirect(url_for("genral_bp.home_page"))
+
+        session["pending_email"] = form.email.data
 
         flash(
             message="OTP sent successfully.",
@@ -144,6 +158,10 @@ def verify_otp():
     email = session.get("pending_email")
 
     if email is None:
+        flash(
+            "You Need to register and then verify",
+            "danger",
+        )
         return redirect(url_for("auth_bp.register"))
 
     form = OTPForm()
@@ -152,9 +170,11 @@ def verify_otp():
 
         otp = form.otp.data or ""
 
-        # call your OTPService here
+        if verify_otp_service(
+            email_id=email,
+            submitted_otp=otp,
+        ):
 
-        if otp == "123456":
             flash(
                 "OTP verified successfully.",
                 "success",

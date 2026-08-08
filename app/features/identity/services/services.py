@@ -9,7 +9,7 @@ from ..exceptions import InvalidEmailError
 from ..user import USER_, User
 
 
-from .otp import send_login_otp_to_email
+from .otp import send_register_otp_to_email
 
 
 def get_user_from_email(email_id: str) -> User | None:
@@ -43,10 +43,13 @@ def check_authentication(
         return user_obj
 
 
-def start_regisration(email: str) -> bool:
+def start_regisration(
+    email: str,
+) -> bool:
     """
     It need to send otp in background and send response to user
     quickly i will do this later
+
     Raise:
         InvalidEmailError
 
@@ -54,16 +57,25 @@ def start_regisration(email: str) -> bool:
     """
 
     try:
-        validated_email_id = ValidatedEmail(email_id=email).value
+        validated_email_id = ValidatedEmail(
+            email_id=email,
+        ).value
 
     except InvalidEmailError:
         raise
 
-    mail_send = send_login_otp_to_email(
+    # Here i need to check if the email is already register or not
+    # and based on this i will send him register email else i will
+    # send him the page to login with password or with otp as my
+    # business logic will say to do this
+    
+    # database checking function will run here
+
+    mail_send = send_register_otp_to_email(
         email_id=validated_email_id,
     )
 
     if mail_send.success:
         return True
-    
+
     return False

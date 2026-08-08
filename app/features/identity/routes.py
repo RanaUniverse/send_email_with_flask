@@ -103,7 +103,9 @@ def register():
     if form.validate_on_submit():  # type: ignore
 
         try:
-            register = start_regisration(email=form.email.data or "")
+            register = start_regisration(
+                email=form.email.data or "",
+            )
 
         except InvalidEmailError as e:
             flash(
@@ -122,7 +124,7 @@ def register():
                 message="Email Server Down",
                 category="error",
             )
-            return redirect(url_for("genral_bp.home_page"))
+            return redirect(url_for("general_bp.home_page"))
 
         session["pending_email"] = form.email.data
 

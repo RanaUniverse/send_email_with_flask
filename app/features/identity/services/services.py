@@ -11,6 +11,11 @@ from ..user import USER_, User
 
 from .otp import send_register_otp_to_email
 
+from ..enums import RegistrationStatus
+from ..models import RegistrationResult
+
+from app.shared.otp.models import OTPSendStatus
+
 
 def get_user_from_email(email_id: str) -> User | None:
     for user in USER_.values():
@@ -45,7 +50,7 @@ def check_authentication(
 
 def start_regisration(
     email: str,
-) -> bool:
+) -> RegistrationResult:
     """
     It need to send otp in background and send response to user
     quickly i will do this later
@@ -68,14 +73,47 @@ def start_regisration(
     # and based on this i will send him register email else i will
     # send him the page to login with password or with otp as my
     # business logic will say to do this
-    
+
     # database checking function will run here
 
     mail_send = send_register_otp_to_email(
         email_id=validated_email_id,
     )
 
-    if mail_send.success:
-        return True
+    # Below the data from the otp backend is converted to shows
+    # in the interface layer of how to do shows the data
 
-    return False
+    if mail_send.success:
+        x = RegistrationResult(
+            status=RegistrationStatus.OTP_SENT,
+        )
+        return x
+
+    elif mail_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
+        return RegistrationResult(
+            status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
+        )
+
+    elif mail_send.status == OTPSendStatus.EMAIL_BLOCKED:
+        return RegistrationResult(
+            status=RegistrationStatus.EMAIL_BLOCKED,
+        )
+
+    elif mail_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
+        return RegistrationResult(
+            status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
+        )
+
+    elif mail_send.status in (
+        OTPSendStatus.SEND_FAILED,
+        OTPSendStatus.EMAIL_SERVER_FAILED,
+    ):
+        return RegistrationResult(
+            status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+        )
+
+    else:
+        x = RegistrationResult(
+            status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+        )
+        return x

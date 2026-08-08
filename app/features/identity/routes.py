@@ -26,6 +26,7 @@ from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from .services.otp import verify_otp_service
 from .services.services import check_authentication, start_regisration
+from .presentation import registration_to_flash
 
 # TODO  i will later change this to call the service which will call the otp
 
@@ -119,21 +120,30 @@ def register():
 
         # TODO later i will add a step if mail server down or somethign so that i can
         # shows to use another way like this based on this
-        if not register:
-            flash(
-                message="Email Server Down",
-                category="error",
+
+        information = registration_to_flash(
+            result=register,
+        )
+
+        flash(
+            message=information.message,
+            category=information.category,
+        )
+
+        if not register.success:
+            return redirect(
+                url_for(
+                    "auth_bp.register",
+                )
             )
-            return redirect(url_for("general_bp.home_page"))
 
         session["pending_email"] = form.email.data
 
-        flash(
-            message="OTP sent successfully.",
-            category="success",
+        return redirect(
+            url_for(
+                "auth_bp.verify_otp",
+            )
         )
-
-        return redirect(url_for("auth_bp.verify_otp"))
 
         # i wnat to send otp if the email is right where i shoudl to do i wnat to use ddd and how?
 

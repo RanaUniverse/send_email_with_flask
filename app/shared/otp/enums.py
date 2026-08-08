@@ -16,9 +16,17 @@ class OTPPurpose(StrEnum):
 
 
 class OTPSendStatus(StrEnum):
+    """
+    This is an enum class of string
+    it will keep note of the otp send
+    informaiton if it send or not or anythign
+    """
+
     SENT = "sent"
+
     COOLDOWN_ACTIVE = "cooldown_active"
     EMAIL_BLOCKED = "email_blocked"
     ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"
+
     EMAIL_SERVER_FAILED = "email_server_failed"
     SEND_FAILED = "send_failed"

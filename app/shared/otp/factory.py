@@ -4,43 +4,58 @@ app/shared/otp/factory.py
 Here i will out which otp model i will use in my case
 """
 
-from .generator import (
-    OTPGenerator,
-    LocalTestingOTPGenerator,
-    OTPAlphabetGenerator,
-    OTPNumberGenerator,
-)
-
-from .repository import (
-    OTPRepository,
-    LocalTestingOTPRepository,
-)
+from .interfaces.attempts import OTPAttemptTracker
+from .interfaces.cooldown import OTPCooldown
+from .interfaces.generator import OTPGenerator
+from .interfaces.storage import OTPStorage
 
 
-def get_otp_generator() -> OTPGenerator:
-    """
-    This will choose if i will going to use what
-    """
-    # TODO
-    # later i will get this form the env
+from .infrastructure.attempts import LocalOTPAttemptTracker
+from .infrastructure.cooldown import LocalCooldown
+from .infrastructure.generator import LocalTestingOTPGenerator
+from .infrastructure.storage import LocalTestingOTPStorage
 
-    which = True
 
-    if which:
-        return OTPNumberGenerator()
-    else:
-        return OTPAlphabetGenerator()
+def create_otp_attempt_tracker() -> OTPAttemptTracker:
+    return LocalOTPAttemptTracker()
 
+
+def create_otp_cooldown() -> OTPCooldown:
+    return LocalCooldown()
+
+
+def create_otp_generator() -> OTPGenerator:
     return LocalTestingOTPGenerator()
 
 
-def get_otp_repository() -> OTPRepository:
-    """
-    See i will probably use redis in real time
-    """
-    o = LocalTestingOTPRepository()
-    return o
+def create_otp_storage() -> OTPStorage:
+    return LocalTestingOTPStorage()
 
 
-otp_repository_obj = get_otp_repository()
-otp_generator_obj = get_otp_generator()
+# I keep upper fun differntly here so that i can change any logic
+# if i want to change any component there
+
+
+def create_otp_components() -> tuple[
+    OTPStorage,
+    OTPGenerator,
+    OTPCooldown,
+    OTPAttemptTracker,
+]:
+    """
+    This is creating all the necessary otp related objects
+    i will use those values as dependency injection in my usecase
+    """
+    attempt_tracker_obj = create_otp_attempt_tracker()
+    cooldown_obj = create_otp_cooldown()
+    generator_obj = create_otp_generator()
+    storage_obj = create_otp_storage()
+    return (
+        storage_obj,
+        generator_obj,
+        cooldown_obj,
+        attempt_tracker_obj,
+    )
+
+
+otp_componenet_objects = create_otp_components()

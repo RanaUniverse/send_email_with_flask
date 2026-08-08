@@ -13,3 +13,12 @@ class OTPPurpose(StrEnum):
     LOGIN = "login"
     FORGET_PASSWORD = "forget_password"
     ORDER_CONFIRMATION = "order_confirmation"
+
+
+class OTPSendStatus(StrEnum):
+    SENT = "sent"
+    COOLDOWN_ACTIVE = "cooldown_active"
+    EMAIL_BLOCKED = "email_blocked"
+    ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"
+    EMAIL_SERVER_FAILED = "email_server_failed"
+    SEND_FAILED = "send_failed"

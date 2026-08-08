@@ -8,7 +8,17 @@ and then i will use this for send or use
 from pydantic import BaseModel
 
 
+from .enums import OTPSendStatus
+
+
 class OTPSendResult(BaseModel):
-    success: bool
+
+    status: OTPSendStatus
     message: str
 
+    @property
+    def success(
+        self,
+    ):
+        x = self.status == OTPSendStatus.SENT
+        return x

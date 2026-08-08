@@ -13,15 +13,27 @@ not wait for the email has send successfully or not
 from pydantic import EmailStr
 
 
-from .enums import OTPPurpose
-from .generator import OTPGenerator
-from .repository import OTPRepository
+from app.config import settings
+
+from .enums import OTPPurpose, OTPSendStatus
 from ..mail.sender import EmailSender
 from ..mail.models import EmailMessageData
 from .models import OTPSendResult
 from .render import render_login_otp
 
-from app.config import settings
+
+from .interfaces.attempts import OTPAttemptTracker
+from .interfaces.cooldown import OTPCooldown
+from .interfaces.generator import OTPGenerator
+from .interfaces.storage import OTPStorage
+
+from .interfaces.blocklist import Blocklist
+from .infrastructure.blocklist import localinmemoryblocklist_obj
+
+# TODO i will later use this from the config
+# i will do it from reality later when i will impliment this
+
+OTP_BLOCKLIST_ENABLED: bool = True
 
 
 class OTPSendService:
@@ -32,13 +44,21 @@ class OTPSendService:
 
     def __init__(
         self,
-        repository: OTPRepository,
+        attempt: OTPAttemptTracker,
+        cooldown: OTPCooldown,
         generator: OTPGenerator,
+        storage: OTPStorage,
         sender: EmailSender,
     ) -> None:
-        self._repository = repository
+        self._attempt = attempt
+        self._cooldown = cooldown
         self._generator = generator
+        self._storage = storage
         self._sender = sender
+
+        # For now i make this here later i will make this with di
+        # as still this is developing i am making this here
+        self._blocklist: Blocklist = localinmemoryblocklist_obj
 
     def execute(
         self,
@@ -51,42 +71,50 @@ class OTPSendService:
         1. Check Cooldown
         2. Generate OTP
         3. clear old cooldown
-
         """
         # First it will check if this email is block for response for sometime or not
         # if not block it will then try to send the otp to the user
         # TODO
 
-        if self._repository.is_cooldown_active(
+        if OTP_BLOCKLIST_ENABLED:
+            if self._blocklist.is_blocked(
+                identifier=identifier,
+            ):
+                return OTPSendResult(
+                    status=OTPSendStatus.EMAIL_BLOCKED,
+                    message="This Email is Blocked ",
+                )
+
+        if self._cooldown.is_active(
             identifier=identifier,
             purpose=purpose_str,
         ):
             return OTPSendResult(
-                success=False,
-                message="Please Wait Before Request Another OTP in Cooldown...",
+                status=OTPSendStatus.COOLDOWN_ACTIVE,
+                message="Cooldown is Active",
             )
 
         otp = self._generator.generate(
             length=6,
         )
 
-        self._repository.save_otp(
+        self._storage.save_otp(
             identifier=identifier,
             purpose=purpose_str,
             otp=otp,
         )
 
-        self._repository.reset_attempt(
+        self._attempt.reset(
+            identifier=identifier,
+            purpose=purpose_str,
+        )
+        self._cooldown.start(
             identifier=identifier,
             purpose=purpose_str,
         )
 
-        self._repository.start_cooldown(
-            identifier=identifier,
-            purpose=purpose_str,
-        )
-
-        # later i will make this to the celry to call thia later
+        # TODO
+        # later i will make this to the celry to call this later
         mail_sub = "This Is Your OTP"
         mail_body, mail_html = render_login_otp(
             otp=otp,
@@ -106,6 +134,6 @@ class OTPSendService:
             email_msg=email_data,
         )
         return OTPSendResult(
-            success=True,
-            message="OTP Has Started to send to this email id",
+            status=OTPSendStatus.SENT,
+            message="OTP Has Successfully Sended to User.",
         )

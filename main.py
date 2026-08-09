@@ -1,3 +1,19 @@
+"""
+main.py
+
+This is the entrypoint of my application, so i did run this
+
+i keep the dont write bytecode first so that in local development
+i will not need to see the pycache folders there in my repo
+"""
+
+import sys
+
+sys.dont_write_bytecode = True
+
+# This upper is for safety and just to keep in the repo for testing purpose only
+
+
 from flask import Flask
 
 

@@ -18,6 +18,7 @@ class LocalTestingOTPStorage:
         identifier: str,
         purpose: OTPPurpose,
         otp: str,
+        ttl_seconds: int,
     ) -> None:
         """
         This should to save the otp so that later i can check

@@ -31,9 +31,12 @@ class OTPStorage(Protocol):
         identifier: str,
         purpose: OTPPurpose,
         otp: str,
+        ttl_seconds: int,
     ) -> None:
         """
         This should to save the otp so that later i can check
+
+        ttl-seconds: How long time the otp will be validate then it will invalid
         """
         ...
 

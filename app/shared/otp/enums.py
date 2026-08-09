@@ -9,6 +9,14 @@ from enum import StrEnum
 
 
 class OTPPurpose(StrEnum):
+    """
+    How the differentiate will be between login/register and
+    the purpose of the otp generation will be here
+
+    After adding New OTPPurpose i need to check and
+    add the email presentation and others cases.
+    """
+
     REGISTER = "register"
     LOGIN = "login"
     FORGET_PASSWORD = "forget_password"

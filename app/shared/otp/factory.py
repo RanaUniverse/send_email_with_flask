@@ -12,7 +12,7 @@ from .interfaces.storage import OTPStorage
 
 from .infrastructure.attempts import LocalOTPAttemptTracker
 from .infrastructure.cooldown import LocalCooldown
-from .infrastructure.generator import LocalTestingOTPGenerator
+from .infrastructure.generator import OTPNumberGenerator
 from .infrastructure.storage import LocalTestingOTPStorage
 
 
@@ -25,7 +25,7 @@ def create_otp_cooldown() -> OTPCooldown:
 
 
 def create_otp_generator() -> OTPGenerator:
-    return LocalTestingOTPGenerator()
+    return OTPNumberGenerator()
 
 
 def create_otp_storage() -> OTPStorage:

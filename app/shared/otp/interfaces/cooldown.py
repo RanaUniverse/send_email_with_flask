@@ -34,8 +34,11 @@ class OTPCooldown(Protocol):
         *,
         identifier: EmailStr,
         purpose: OTPPurpose,
+        cooldown_seconds: int,
     ) -> None:
         """
         This will start the cooldown here
+
+        validity-> How many time seconds the cooldown will be active
         """
         ...

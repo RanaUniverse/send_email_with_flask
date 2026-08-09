@@ -19,8 +19,8 @@ from .enums import OTPPurpose, OTPSendStatus
 from ..mail.sender import EmailSender
 from ..mail.models import EmailMessageData
 from .models import OTPSendResult
-from .render import render_login_otp
-
+from .render import render_otp_email
+from .policy import get_otp_policy_obj
 
 from .interfaces.attempts import OTPAttemptTracker
 from .interfaces.cooldown import OTPCooldown
@@ -63,7 +63,7 @@ class OTPSendService:
     def execute(
         self,
         identifier: EmailStr,
-        purpose_str: OTPPurpose,
+        purpose: OTPPurpose,
     ) -> OTPSendResult:
         """
         This will check if otp will send or not by calling the shared/otp related things
@@ -87,47 +87,57 @@ class OTPSendService:
 
         if self._cooldown.is_active(
             identifier=identifier,
-            purpose=purpose_str,
+            purpose=purpose,
         ):
             return OTPSendResult(
                 status=OTPSendStatus.COOLDOWN_ACTIVE,
-                message="Cooldown is Active",
+                message="Cooldown is Active Now Wait until cooldown expires",
             )
 
+        otp_policy_obj = get_otp_policy_obj(
+            purpose=purpose,
+        )
+
         otp = self._generator.generate(
-            length=6,
+            length=otp_policy_obj.length,
         )
 
         self._storage.save_otp(
             identifier=identifier,
-            purpose=purpose_str,
+            purpose=purpose,
             otp=otp,
+            ttl_seconds=otp_policy_obj.validity,
         )
 
         self._attempt.reset(
             identifier=identifier,
-            purpose=purpose_str,
+            purpose=purpose,
         )
+
         self._cooldown.start(
             identifier=identifier,
-            purpose=purpose_str,
+            purpose=purpose,
+            cooldown_seconds=otp_policy_obj.cooldown,
         )
 
         # TODO
         # later i will make this to the celry to call this later
-        mail_sub = "This Is Your OTP"
-        mail_body, mail_html = render_login_otp(
+        mail_data = render_otp_email(
             otp=otp,
-            valid_seconds=60,
+            valid_seconds=otp_policy_obj.validity,
+            purpose=purpose,
         )
+        mail_sub = mail_data.subject
+        body_text = mail_data.body_text
+        body_html = mail_data.body_html
         # i will call this from the templates.py to genreeat this body
         email_data = EmailMessageData(
             to_email=[
                 identifier,
             ],
             subject=mail_sub,
-            body_text=mail_body,
-            body_html=mail_html,
+            body_text=body_text,
+            body_html=body_html,
             reply_to=settings.mail.reply_to_otp,
         )
         self._sender.send_mail(

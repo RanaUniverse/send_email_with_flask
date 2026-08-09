@@ -41,6 +41,7 @@ class LocalCooldown:
         *,
         identifier: EmailStr,
         purpose: OTPPurpose,
+        cooldown_seconds: int,
     ) -> None:
         """
         This will start the cooldown here

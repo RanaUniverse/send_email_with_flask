@@ -28,6 +28,8 @@ from .services.otp import verify_otp_service
 from .services.services import check_authentication, registration_service_obj
 from .presentation import registration_to_flash
 
+from .enums import AfterRegistrationNextStep
+
 # TODO  i will later change this to call the service which will call the otp
 
 
@@ -92,6 +94,70 @@ def logout():
 
 
 @auth_bp.route(
+    rule="/login-with-password",
+    methods=["GET", "POST"],
+)
+def login_with_password():
+    """
+    This will take the email id and ask for the password to enter
+
+    Currently this is for coming from register
+
+    I will make this workable with login routes goodly and logically
+    """
+
+    email = session.get("pending_login_email")
+
+    if email is None:
+        flash(
+            "Please Enter your email and password to login",
+            "warning",
+        )
+        return redirect(
+            url_for(
+                "auth_bp.login",
+            )
+        )
+
+    form = LoginForm()
+
+    if form.validate_on_submit():  # type: ignore
+        password = form.password.data or ""
+        user_obj = check_authentication(
+            email=email,
+            password=password,
+        )
+
+        if user_obj:
+            login_user(user=user_obj)
+            session.pop(
+                "pending_login_email",
+                None,
+            )
+            flash(
+                "Login Successfull",
+                "success",
+            )
+
+            return redirect(
+                url_for(
+                    "general_bp.home_page",
+                )
+            )
+
+        flash(
+            "wrong Password",
+            "warning",
+        )
+
+    return render_template(
+        "auth/login_with_password.html",
+        form=form,
+        email=email,
+    )
+
+
+@auth_bp.route(
     rule="/register",
     methods=["GET", "POST"],
 )
@@ -130,20 +196,31 @@ def register():
             category=information.category,
         )
 
-        if not register.success:
+        if register.next_step == AfterRegistrationNextStep.VERIFY_OTP:
+
+            session["pending_email"] = form.email.data
+
+            return redirect(
+                url_for(
+                    "auth_bp.verify_otp",
+                )
+            )
+
+        if register.next_step == AfterRegistrationNextStep.ENTER_PASSWORD:
+            session["pending_login_email"] = form.email.data
+            return redirect(
+                url_for(
+                    "auth_bp.login_with_password",
+                )
+            )
+
+        if register.next_step == AfterRegistrationNextStep.SHOW_ERROR:
+
             return redirect(
                 url_for(
                     "auth_bp.register",
                 )
             )
-
-        session["pending_email"] = form.email.data
-
-        return redirect(
-            url_for(
-                "auth_bp.verify_otp",
-            )
-        )
 
         # i wnat to send otp if the email is right where i shoudl to do i wnat to use ddd and how?
 

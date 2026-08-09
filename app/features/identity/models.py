@@ -7,12 +7,13 @@ This will have the models or data to keep for this related thigns
 from pydantic import BaseModel
 
 
-from .enums import RegistrationStatus
+from .enums import RegistrationStatus, AfterRegistrationNextStep
 
 
 class RegistrationResult(BaseModel):
 
     status: RegistrationStatus
+    next_step: AfterRegistrationNextStep
 
     @property
     def success(

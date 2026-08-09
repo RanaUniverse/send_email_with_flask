@@ -4,6 +4,9 @@ app/features/identity/services.py
 Here i will write my business logics like how the login works and so on
 """
 
+from pydantic import EmailStr
+
+
 from ..domain.email_validation import ValidatedEmail
 from ..exceptions import InvalidEmailError
 from ..user import USER_, User
@@ -11,7 +14,7 @@ from ..user import USER_, User
 
 from .otp import send_register_otp_to_email
 
-from ..enums import RegistrationStatus
+from ..enums import RegistrationStatus, AfterRegistrationNextStep
 from ..models import RegistrationResult
 
 from app.shared.otp.models import OTPSendStatus
@@ -27,7 +30,7 @@ class UserRepository:
 
     def get_by_email(
         self,
-        email: str,
+        email: EmailStr,
     ) -> User | None:
 
         for user in USER_.values():
@@ -38,14 +41,14 @@ class UserRepository:
 
     def exists_by_email(
         self,
-        email: str,
+        email: EmailStr,
     ) -> bool:
 
         return self.get_by_email(email) is not None
 
 
 def check_authentication(
-    email: str,
+    email: EmailStr,
     password: str,
 ) -> User | None:
     """
@@ -102,12 +105,13 @@ class RegistrationService:
         except InvalidEmailError:
             raise
 
-        is_user = self._user_repository.exists_by_email(
-            email=email,
+        existing_user = self._user_repository.exists_by_email(
+            email=validated_email_id,
         )
-        if is_user:
+        if existing_user:
             x = RegistrationResult(
                 status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
+                next_step=AfterRegistrationNextStep.ENTER_PASSWORD,
             )
             return x
 
@@ -118,46 +122,53 @@ class RegistrationService:
 
         # database checking function will run here
 
-        mail_send = send_register_otp_to_email(
+        otp_send = send_register_otp_to_email(
             email_id=validated_email_id,
         )
 
         # Below the data from the otp backend is converted to shows
         # in the interface layer of how to do shows the data
 
-        if mail_send.success:
+        if otp_send.success:
             x = RegistrationResult(
                 status=RegistrationStatus.OTP_SENT,
+                next_step=AfterRegistrationNextStep.VERIFY_OTP,
             )
             return x
 
-        elif mail_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
+        elif otp_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
             return RegistrationResult(
                 status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
+                next_step=AfterRegistrationNextStep.SHOW_ERROR,
             )
 
-        elif mail_send.status == OTPSendStatus.EMAIL_BLOCKED:
+        elif otp_send.status == OTPSendStatus.EMAIL_BLOCKED:
             return RegistrationResult(
                 status=RegistrationStatus.EMAIL_BLOCKED,
+                next_step=AfterRegistrationNextStep.SHOW_ERROR,
             )
 
-        elif mail_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
+        elif otp_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
             return RegistrationResult(
                 status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
+                next_step=AfterRegistrationNextStep.SHOW_ERROR,
             )
 
-        elif mail_send.status in (
+        elif otp_send.status in (
             OTPSendStatus.SEND_FAILED,
             OTPSendStatus.EMAIL_SERVER_FAILED,
         ):
             return RegistrationResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+                next_step=AfterRegistrationNextStep.SHOW_ERROR,
             )
 
         else:
             x = RegistrationResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+                next_step=AfterRegistrationNextStep.SHOW_ERROR,
             )
+
             return x
 
 

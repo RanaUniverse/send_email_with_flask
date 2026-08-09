@@ -7,6 +7,12 @@ Here i will keep the needed thigns to easily access this
 from enum import StrEnum
 
 
+class AfterRegistrationNextStep(StrEnum):
+    ENTER_PASSWORD = "enter_password"
+    VERIFY_OTP = "verify_otp"
+    SHOW_ERROR = "show_error"
+
+
 class RegistrationStatus(StrEnum):
     OTP_SENT = "otp_sent"
 

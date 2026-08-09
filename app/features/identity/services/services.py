@@ -17,12 +17,31 @@ from ..models import RegistrationResult
 from app.shared.otp.models import OTPSendStatus
 
 
-def get_user_from_email(email_id: str) -> User | None:
-    for user in USER_.values():
-        if user.email == email_id:
-            return user
+from ..user import USER_, User
 
-    return None
+
+class UserRepository:
+    """
+    This is have user related information extract methods
+    """
+
+    def get_by_email(
+        self,
+        email: str,
+    ) -> User | None:
+
+        for user in USER_.values():
+            if user.email == email:
+                return user
+
+        return None
+
+    def exists_by_email(
+        self,
+        email: str,
+    ) -> bool:
+
+        return self.get_by_email(email) is not None
 
 
 def check_authentication(
@@ -36,8 +55,9 @@ def check_authentication(
         User: The authenticated user if the credentials are valid.
         None: If authentication fails.
     """
-    user_obj = get_user_from_email(
-        email_id=email,
+    u = UserRepository()
+    user_obj = u.get_by_email(
+        email=email,
     )
     if not user_obj:
         return None
@@ -48,72 +68,100 @@ def check_authentication(
         return user_obj
 
 
-def start_regisration(
-    email: str,
-) -> RegistrationResult:
+class RegistrationService:
     """
-    It need to send otp in background and send response to user
-    quickly i will do this later
-
-    Raise:
-        InvalidEmailError
-
-    #TODO
+    This will have all the registration related things
+    fucntion and checking form this
     """
 
-    try:
-        validated_email_id = ValidatedEmail(
-            email_id=email,
-        ).value
+    def __init__(
+        self,
+        user_repository: UserRepository,
+    ) -> None:
+        self._user_repository = user_repository
 
-    except InvalidEmailError:
-        raise
+    def start_registration(
+        self,
+        email: str,
+    ) -> RegistrationResult:
+        """
+        It need to send otp in background and send response to user
+        quickly i will do this later
 
-    # Here i need to check if the email is already register or not
-    # and based on this i will send him register email else i will
-    # send him the page to login with password or with otp as my
-    # business logic will say to do this
+        Raise:
+            InvalidEmailError
 
-    # database checking function will run here
+        #TODO
+        """
 
-    mail_send = send_register_otp_to_email(
-        email_id=validated_email_id,
-    )
+        try:
+            validated_email_id = ValidatedEmail(
+                email_id=email,
+            ).value
 
-    # Below the data from the otp backend is converted to shows
-    # in the interface layer of how to do shows the data
+        except InvalidEmailError:
+            raise
 
-    if mail_send.success:
-        x = RegistrationResult(
-            status=RegistrationStatus.OTP_SENT,
+        is_user = self._user_repository.exists_by_email(
+            email=email,
         )
-        return x
+        if is_user:
+            x = RegistrationResult(
+                status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
+            )
+            return x
 
-    elif mail_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
-        return RegistrationResult(
-            status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
-        )
+        # Here i need to check if the email is already register or not
+        # and based on this i will send him register email else i will
+        # send him the page to login with password or with otp as my
+        # business logic will say to do this
 
-    elif mail_send.status == OTPSendStatus.EMAIL_BLOCKED:
-        return RegistrationResult(
-            status=RegistrationStatus.EMAIL_BLOCKED,
-        )
+        # database checking function will run here
 
-    elif mail_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
-        return RegistrationResult(
-            status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
-        )
-
-    elif mail_send.status in (
-        OTPSendStatus.SEND_FAILED,
-        OTPSendStatus.EMAIL_SERVER_FAILED,
-    ):
-        return RegistrationResult(
-            status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+        mail_send = send_register_otp_to_email(
+            email_id=validated_email_id,
         )
 
-    else:
-        x = RegistrationResult(
-            status=RegistrationStatus.EMAIL_SERVICE_FAILED,
-        )
-        return x
+        # Below the data from the otp backend is converted to shows
+        # in the interface layer of how to do shows the data
+
+        if mail_send.success:
+            x = RegistrationResult(
+                status=RegistrationStatus.OTP_SENT,
+            )
+            return x
+
+        elif mail_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
+            return RegistrationResult(
+                status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
+            )
+
+        elif mail_send.status == OTPSendStatus.EMAIL_BLOCKED:
+            return RegistrationResult(
+                status=RegistrationStatus.EMAIL_BLOCKED,
+            )
+
+        elif mail_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
+            return RegistrationResult(
+                status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
+            )
+
+        elif mail_send.status in (
+            OTPSendStatus.SEND_FAILED,
+            OTPSendStatus.EMAIL_SERVER_FAILED,
+        ):
+            return RegistrationResult(
+                status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+            )
+
+        else:
+            x = RegistrationResult(
+                status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+            )
+            return x
+
+
+user_repository_obj = UserRepository()
+registration_service_obj = RegistrationService(
+    user_repository=user_repository_obj,
+)

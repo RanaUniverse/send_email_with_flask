@@ -25,7 +25,7 @@ from flask_login import (  # type: ignore
 from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from .services.otp import verify_otp_service
-from .services.services import check_authentication, start_regisration
+from .services.services import check_authentication, registration_service_obj
 from .presentation import registration_to_flash
 
 # TODO  i will later change this to call the service which will call the otp
@@ -104,7 +104,7 @@ def register():
     if form.validate_on_submit():  # type: ignore
 
         try:
-            register = start_regisration(
+            register = registration_service_obj.start_registration(
                 email=form.email.data or "",
             )
 

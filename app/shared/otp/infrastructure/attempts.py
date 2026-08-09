@@ -1,5 +1,5 @@
 """
-app/shared/otp/infrastructer/attempts.py
+app/shared/otp/infrastructure/attempts.py
 
 Here i will write the real backend service of how they will have the attempts
 """

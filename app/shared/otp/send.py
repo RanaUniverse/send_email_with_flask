@@ -23,12 +23,10 @@ from .render import render_otp_email
 from .policy import get_otp_policy_obj
 
 from .interfaces.attempts import OTPAttemptTracker
+from .interfaces.blocklist import BlockList
 from .interfaces.cooldown import OTPCooldown
 from .interfaces.generator import OTPGenerator
 from .interfaces.storage import OTPStorage
-
-from .interfaces.blocklist import Blocklist
-from .infrastructure.blocklist import localinmemoryblocklist_obj
 
 # TODO i will later use this from the config
 # i will do it from reality later when i will impliment this
@@ -49,16 +47,14 @@ class OTPSendService:
         generator: OTPGenerator,
         storage: OTPStorage,
         sender: EmailSender,
+        blocklist: BlockList,
     ) -> None:
         self._attempt = attempt
         self._cooldown = cooldown
         self._generator = generator
         self._storage = storage
         self._sender = sender
-
-        # For now i make this here later i will make this with di
-        # as still this is developing i am making this here
-        self._blocklist: Blocklist = localinmemoryblocklist_obj
+        self._blocklist = blocklist
 
     def execute(
         self,

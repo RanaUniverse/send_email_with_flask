@@ -5,12 +5,13 @@ Here i will out which otp model i will use in my case
 """
 
 from .interfaces.attempts import OTPAttemptTracker
+from .interfaces.blocklist import BlockList
 from .interfaces.cooldown import OTPCooldown
 from .interfaces.generator import OTPGenerator
 from .interfaces.storage import OTPStorage
 
-
 from .infrastructure.attempts import LocalOTPAttemptTracker
+from .infrastructure.blocklist import LocalInMemoryBlocklist
 from .infrastructure.cooldown import LocalCooldown
 from .infrastructure.generator import OTPNumberGenerator
 from .infrastructure.storage import LocalTestingOTPStorage
@@ -58,4 +59,12 @@ def create_otp_components() -> tuple[
     )
 
 
+def get_blocklist_email() -> BlockList:
+    """
+    For now locally development it send later i will use real db
+    """
+    return LocalInMemoryBlocklist()
+
+
+blocklist_email_obj = get_blocklist_email()
 otp_componenet_objects = create_otp_components()

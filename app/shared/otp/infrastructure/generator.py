@@ -1,5 +1,5 @@
 """
-app/shared/otp/infrastructer/generator.py
+app/shared/otp/infrastructure/generator.py
 
 Here i will have the logic to generate the otp
 this values i will call in my send, executes and so on using the factory.py

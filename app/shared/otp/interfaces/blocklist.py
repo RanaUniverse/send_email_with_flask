@@ -11,7 +11,7 @@ from typing import Protocol
 from pydantic import EmailStr
 
 
-class Blocklist(Protocol):
+class BlockList(Protocol):
     """
     1. is_blocked()
 
@@ -19,8 +19,14 @@ class Blocklist(Protocol):
     and then also return if a user is blocked or not
     """
 
-    def is_blocked(self, identifier: EmailStr) -> bool:
+    def is_blocked(
+        self,
+        identifier: EmailStr,
+    ) -> bool:
         """
+        For now i am only using Email Address later i will use the
+        sms, whatsapp, tg like otp validation
+
         It should check if the email is in blocked or not
         """
         ...

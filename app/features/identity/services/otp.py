@@ -13,7 +13,10 @@ from pydantic import EmailStr
 from app.shared.otp.send import OTPSendService
 from app.shared.otp.models import OTPSendResult
 
-from app.shared.otp.factory import otp_componenet_objects
+from app.shared.otp.factory import (
+    otp_componenet_objects,
+    blocklist_email_obj,
+)
 
 from app.shared.mail.factory import mail_sender_obj
 
@@ -51,6 +54,7 @@ def send_otp_to_email(
         generator=generator_obj,
         storage=storage_obj,
         sender=mail_sender_obj,
+        blocklist=blocklist_email_obj,
     )
 
     mail_send = s.execute(

@@ -1,5 +1,5 @@
 """
-app/shared/otp/infrastructer/cooldown.py
+app/shared/otp/infrastructure/cooldown.py
 
 This will have the logic only of how to handle the cooldown thigns
 """

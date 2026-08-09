@@ -1,5 +1,5 @@
 """
-app/shared/otp/infrastructer/blocklist.py
+app/shared/otp/infrastructure/blocklist.py
 
 i will make real implimentation here of real logics here
 """
@@ -7,12 +7,14 @@ i will make real implimentation here of real logics here
 from pydantic import EmailStr
 
 
-from ..interfaces.blocklist import Blocklist  # type: ignore
+from ..interfaces.blocklist import BlockList  # type: ignore
 
 
 class LocalInMemoryBlocklist:
     """
     This is for local testing only i will use for learning purpose only
+
+    Here i keep some local emails to block them.
     """
 
     def __init__(self) -> None:
@@ -33,5 +35,3 @@ class LocalInMemoryBlocklist:
         """
         x = identifier.lower() in self._blocked_identifiers
         return x
-
-localinmemoryblocklist_obj = LocalInMemoryBlocklist()

@@ -1,5 +1,5 @@
 """
-app/shared/otp/infrastructer/cooldown.py
+app/shared/otp/infrastructure/cooldown.py
 
 Here i will write the code to store otp thigns in reality how
 it maybe redis, db or somethigns

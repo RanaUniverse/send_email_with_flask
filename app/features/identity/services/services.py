@@ -12,12 +12,13 @@ from ..exceptions import InvalidEmailError
 from ..user import USER_, User
 
 
-from .otp import send_register_otp_to_email
+from .otp import send_otp_to_email
 
 from ..enums import RegistrationStatus, AfterRegistrationNextStep
 from ..models import RegistrationResult
 
 from app.shared.otp.models import OTPSendStatus
+from app.shared.otp.enums import OTPPurpose
 
 
 from ..user import USER_, User
@@ -122,8 +123,9 @@ class RegistrationService:
 
         # database checking function will run here
 
-        otp_send = send_register_otp_to_email(
+        otp_send = send_otp_to_email(
             email_id=validated_email_id,
+            purpose=OTPPurpose.REGISTER,
         )
 
         # Below the data from the otp backend is converted to shows

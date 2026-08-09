@@ -1,9 +1,14 @@
 """
 app/features/identity/services/otp.py
 
+Identity specefic OTP operations.
+
 Here i will write my otp related services
 Like how it will call otp generate, verifications and so on
 """
+
+from pydantic import EmailStr
+
 
 from app.shared.otp.send import OTPSendService
 from app.shared.otp.models import OTPSendResult
@@ -28,13 +33,13 @@ def verify_otp_service(
     return False
 
 
-def send_register_otp_to_email(
-    email_id: str,
-    purpose_str: OTPPurpose = OTPPurpose.REGISTER,
+def send_otp_to_email(
+    email_id: EmailStr,
+    purpose: OTPPurpose,
 ) -> OTPSendResult:
     """
     Here i need to pass the correct validated email id
-    which is not register in the database and then
+    which is not register/login or what so ever in the database and then
     it will just try to send otp to him
     """
 
@@ -50,7 +55,7 @@ def send_register_otp_to_email(
 
     mail_send = s.execute(
         identifier=email_id,
-        purpose_str=purpose_str,
+        purpose=purpose,
     )
-    
+
     return mail_send

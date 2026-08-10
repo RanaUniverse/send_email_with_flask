@@ -28,6 +28,11 @@ def validate_all_otp_config() -> None:
         print(r)
         print("---")
 
+    else:
+        raise RuntimeError(
+            "This is wrong validation_mode",
+        )
+
     # else:
     #     print("Please Choose This Clearly from the .env of validaion mode")
     #     raise RuntimeError(

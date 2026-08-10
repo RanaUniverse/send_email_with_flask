@@ -28,11 +28,6 @@ from .interfaces.cooldown import OTPCooldown
 from .interfaces.generator import OTPGenerator
 from .interfaces.storage import OTPStorage
 
-# TODO i will later use this from the config
-# i will do it from reality later when i will impliment this
-
-OTP_BLOCKLIST_ENABLED: bool = True
-
 
 class OTPSendService:
     """
@@ -72,14 +67,13 @@ class OTPSendService:
         # if not block it will then try to send the otp to the user
         # TODO
 
-        if OTP_BLOCKLIST_ENABLED:
-            if self._blocklist.is_blocked(
-                identifier=identifier,
-            ):
-                return OTPSendResult(
-                    status=OTPSendStatus.EMAIL_BLOCKED,
-                    message="This Email is Blocked ",
-                )
+        if self._blocklist.is_blocked(
+            identifier=identifier,
+        ):
+            return OTPSendResult(
+                status=OTPSendStatus.EMAIL_BLOCKED,
+                message="This Email is Blocked ",
+            )
 
         if self._cooldown.is_active(
             identifier=identifier,
@@ -141,5 +135,5 @@ class OTPSendService:
         )
         return OTPSendResult(
             status=OTPSendStatus.SENT,
-            message="OTP Has Successfully Sended to User.",
+            message="OTP Request Has Successfully Sended to Email Server.",
         )

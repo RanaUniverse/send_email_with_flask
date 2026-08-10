@@ -4,7 +4,7 @@ app/features/identity/operations.py
 Here i will keep write some db operations
 """
 
-from .user import (
+from .repository.user import (
     User,
     USER_,
 )

@@ -24,8 +24,8 @@ from flask_login import (  # type: ignore
 
 from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
-from .services.otp import verify_otp_service
-from .services.services import check_authentication, registration_service_obj
+from .services.services import check_authentication
+from .dependencies import registration_service_obj
 from .presentation import registration_to_flash
 
 from .enums import AfterRegistrationNextStep
@@ -245,33 +245,60 @@ def register():
 def verify_otp():
 
     email = session.get("pending_email")
+    form = OTPForm()
 
     if email is None:
         flash(
-            "You Need to register and then verify",
+            "You Need to register and then come to verify",
             "danger",
         )
-        return redirect(url_for("auth_bp.register"))
-
-    form = OTPForm()
+        return redirect(
+            url_for(
+                "auth_bp.register",
+            )
+        )
 
     if form.validate_on_submit():  # type: ignore
 
         otp = form.otp.data or ""
 
-        if verify_otp_service(
-            email_id=email,
-            submitted_otp=otp,
-        ):
+        try:
+
+            # at the time of registration i saved the pending_email in
+            # the sesion so i check this value here to get the email and then otp here
+            verify = registration_service_obj.verify_registration_otp(
+                email=email,
+                submitted_otp=otp,
+            )
+
+        except InvalidEmailError as e:
+            flash(
+                message=str(e),
+                category="danger",
+            )
+            return render_template(
+                "auth/verify_otp.html",
+                form=form,
+            )
+
+        if verify.success():
 
             flash(
                 "OTP verified successfully.",
                 "success",
             )
+            flash(
+                "You Are LOG In Successfully",
+                "success",
+            )
 
             session.pop("pending_email", None)
 
-            return redirect(url_for("general_bp.home_page"))
+            return redirect(
+                url_for(
+                    "general_bp.home_page",
+                )
+            )
 
         flash(
             "Invalid OTP",

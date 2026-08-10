@@ -11,29 +11,22 @@ from pydantic import EmailStr
 
 
 from app.shared.otp.send import OTPSendService
-from app.shared.otp.models import OTPSendResult
+from app.shared.otp.models import (
+    OTPSendResult,
+    OTPVerifyResult,
+)
+from app.config import settings
 
 from app.shared.otp.factory import (
     otp_componenet_objects,
-    blocklist_email_obj,
 )
 
 from app.shared.mail.factory import mail_sender_obj
 
-from app.shared.otp.enums import OTPPurpose
-
-
-def verify_otp_service(
-    email_id: str,
-    submitted_otp: str,
-) -> bool:
-    """
-    I will add real checking logic here
-    """
-
-    if email_id == "a@gmail.com" and submitted_otp == "123456":
-        return True
-    return False
+from app.shared.otp.enums import (
+    OTPPurpose,
+    OTPVerifyStatus,
+)
 
 
 def send_otp_to_email(
@@ -46,15 +39,13 @@ def send_otp_to_email(
     it will just try to send otp to him
     """
 
-    storage_obj, generator_obj, cooldown_obj, attempt_obj = otp_componenet_objects
-
     s = OTPSendService(
-        attempt=attempt_obj,
-        cooldown=cooldown_obj,
-        generator=generator_obj,
-        storage=storage_obj,
+        attempt=otp_componenet_objects.attempt,
+        cooldown=otp_componenet_objects.cooldown,
+        generator=otp_componenet_objects.generator,
+        storage=otp_componenet_objects.storage,
+        blocklist=otp_componenet_objects.blocklist,
         sender=mail_sender_obj,
-        blocklist=blocklist_email_obj,
     )
 
     mail_send = s.execute(
@@ -63,3 +54,33 @@ def send_otp_to_email(
     )
 
     return mail_send
+
+
+def verify_otp_against_email(
+    email: EmailStr,
+    purpose: OTPPurpose,
+    submitted_otp: str,
+) -> OTPVerifyResult:
+    """
+    This will take the email_id and then validate those
+    against the otp given by the user
+    """
+    # otp_storage_obj = otp_componenet_objects.storage
+
+    # now for demo i am retgurning from local here demo data
+    # later i will check from the execute methods from the otp shared thigns
+
+    if settings.app.validation_mode == "PRODUCTION":
+        raise RuntimeError(
+            "This otp checking is not made yet",
+        )
+
+    if email == "a@gmail.com" and submitted_otp == "123456":
+
+        return OTPVerifyResult(
+            status=OTPVerifyStatus.VERIFIED,
+        )
+
+    return OTPVerifyResult(
+        status=OTPVerifyStatus.INVALID_OTP,
+    )

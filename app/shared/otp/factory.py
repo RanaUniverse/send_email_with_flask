@@ -4,6 +4,9 @@ app/shared/otp/factory.py
 Here i will out which otp model i will use in my case
 """
 
+from dataclasses import dataclass
+
+
 from .interfaces.attempts import OTPAttemptTracker
 from .interfaces.blocklist import BlockList
 from .interfaces.cooldown import OTPCooldown
@@ -33,38 +36,47 @@ def create_otp_storage() -> OTPStorage:
     return LocalTestingOTPStorage()
 
 
-# I keep upper fun differntly here so that i can change any logic
-# if i want to change any component there
-
-
-def create_otp_components() -> tuple[
-    OTPStorage,
-    OTPGenerator,
-    OTPCooldown,
-    OTPAttemptTracker,
-]:
-    """
-    This is creating all the necessary otp related objects
-    i will use those values as dependency injection in my usecase
-    """
-    attempt_tracker_obj = create_otp_attempt_tracker()
-    cooldown_obj = create_otp_cooldown()
-    generator_obj = create_otp_generator()
-    storage_obj = create_otp_storage()
-    return (
-        storage_obj,
-        generator_obj,
-        cooldown_obj,
-        attempt_tracker_obj,
-    )
-
-
-def get_blocklist_email() -> BlockList:
+def create_blocklist_email() -> BlockList:
     """
     For now locally development it send later i will use real db
     """
     return LocalInMemoryBlocklist()
 
 
-blocklist_email_obj = get_blocklist_email()
+# I keep upper fun differntly here so that i can change any logic
+# if i want to change any component there
+
+
+@dataclass(
+    frozen=True,
+)
+class OTPComponents:
+    storage: OTPStorage
+    generator: OTPGenerator
+    cooldown: OTPCooldown
+    attempt: OTPAttemptTracker
+    blocklist: BlockList
+
+
+def create_otp_components() -> OTPComponents:
+    """
+    This is creating all the necessary otp related objects
+    i will use those values as dependency injection in my usecase
+    """
+
+    attempt_tracker_obj = create_otp_attempt_tracker()
+    cooldown_obj = create_otp_cooldown()
+    generator_obj = create_otp_generator()
+    storage_obj = create_otp_storage()
+    blocklist_email_obj = create_blocklist_email()
+
+    return OTPComponents(
+        storage=storage_obj,
+        generator=generator_obj,
+        cooldown=cooldown_obj,
+        attempt=attempt_tracker_obj,
+        blocklist=blocklist_email_obj,
+    )
+
+
 otp_componenet_objects = create_otp_components()

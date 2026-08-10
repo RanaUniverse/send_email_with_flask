@@ -38,3 +38,16 @@ class OTPSendStatus(StrEnum):
 
     EMAIL_SERVER_FAILED = "email_server_failed"
     SEND_FAILED = "send_failed"
+
+
+class OTPVerifyStatus(StrEnum):
+    """
+    this will need to call when i will send
+    what happens after the otp got received to check
+    it will say what actulaly happens by this check
+    """
+
+    VERIFIED = "verified"
+    OTP_NOT_FOUND = "otp_not_found"
+    INVALID_OTP = "invalid_otp"
+    ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"

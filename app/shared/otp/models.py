@@ -8,10 +8,14 @@ and then i will use this for send or use
 from pydantic import BaseModel, Field
 
 
-from .enums import OTPSendStatus
+from .enums import OTPSendStatus, OTPVerifyStatus
 
 
 class OTPSendResult(BaseModel):
+    """
+    After the backend try to send the opt
+    it will send this result class
+    """
 
     status: OTPSendStatus
     message: str
@@ -20,8 +24,23 @@ class OTPSendResult(BaseModel):
     def success(
         self,
     ):
-        x = self.status == OTPSendStatus.SENT
-        return x
+        r = self.status == OTPSendStatus.SENT
+        return r
+
+
+class OTPVerifyResult(BaseModel):
+    """
+    After i try to verify otp is validated or not
+    this should to return to the user interface
+    """
+
+    status: OTPVerifyStatus
+    message: str | None = None
+
+    @property
+    def success(self) -> bool:
+        r = self.status == OTPVerifyStatus.VERIFIED
+        return r
 
 
 class OTPPolicy(

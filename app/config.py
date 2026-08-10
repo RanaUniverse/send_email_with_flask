@@ -30,6 +30,11 @@ class AppSettings(BaseModel):
     debug: bool = False
     secret_key: SecretStr
 
+    validation_mode: Literal[
+        "DEVELOPMENT",
+        "PRODUCTION",
+    ]
+
 
 class MailSettings(BaseModel):
     """

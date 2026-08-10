@@ -46,13 +46,12 @@ def create_app() -> Flask:
     app.register_blueprint(blueprint=auth_bp)
     app.register_blueprint(blueprint=general_bp)
     # app.register_blueprint(blueprint=mail_bp)
-
+    validate_all_otp_config()
     return app
 
 
 if __name__ == "__main__":
     app = create_app()
-    validate_all_otp_config()
     print(settings)
     app.run(
         host=settings.app.host,

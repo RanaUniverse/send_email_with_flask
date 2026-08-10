@@ -128,7 +128,7 @@ class OTPSendService:
             subject=mail_sub,
             body_text=body_text,
             body_html=body_html,
-            reply_to=settings.mail.reply_to_otp,
+            reply_to=settings.mail.address.reply_to_otp,
         )
         self._sender.send_mail(
             email_msg=email_data,

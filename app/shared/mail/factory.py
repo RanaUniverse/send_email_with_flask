@@ -18,14 +18,14 @@ def get_mail_sender() -> EmailSender:
     if settings.mail.provider == "local":
         s = LocalMailSender(
             mail_config=local_config,
-            default_from=settings.mail.from_email_default,
+            default_from=settings.mail.address.from_email_default,
         )
         return s
 
     elif settings.mail.provider == "smtp":
         s = SMTPMailSender(
             mail_config=email_config,
-            default_from=settings.mail.from_email_default,
+            default_from=settings.mail.address.from_email_default,
         )
         return s
     else:

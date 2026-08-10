@@ -10,7 +10,7 @@ from typing import Literal
 from pydantic import (
     BaseModel,
     EmailStr,
-    # Field,
+    Field,
     SecretStr,
 )
 
@@ -36,6 +36,26 @@ class AppSettings(BaseModel):
     ]
 
 
+class MailAddressSettings(BaseModel):
+    """
+    All the email address which need to be given
+    in different case i will keep those here
+    """
+
+    from_email_default: EmailStr
+
+    reply_to_default: EmailStr | None = Field(default=None, repr=False)
+    reply_to_billing: EmailStr | None = Field(default=None, repr=False)
+    reply_to_otp: EmailStr | None = Field(default=None, repr=False)
+    reply_to_support: EmailStr | None = Field(default=None, repr=False)
+    reply_to_sales: EmailStr | None = Field(default=None, repr=False)
+    reply_to_security: EmailStr | None = Field(default=None, repr=False)
+    reply_to_account: EmailStr | None = Field(default=None, repr=False)
+    reply_to_jobs: EmailStr | None = Field(default=None, repr=False)
+    reply_to_login: EmailStr | None = Field(default=None, repr=False)
+    reply_to_welcome: EmailStr | None = Field(default=None, repr=False)
+
+
 class MailSettings(BaseModel):
     """
     Email related configuraiton will be here
@@ -50,22 +70,12 @@ class MailSettings(BaseModel):
     port: int
     username: str
     password: SecretStr
-    from_email_default: EmailStr
     security: Literal[
         "ssl",
         "starttls",
     ]
 
-    reply_to_default: EmailStr | None = None
-    reply_to_billing: EmailStr | None = None
-    reply_to_otp: EmailStr | None = None
-    reply_to_support: EmailStr | None = None
-    reply_to_sales: EmailStr | None = None
-    reply_to_security: EmailStr | None = None
-    reply_to_account: EmailStr | None = None
-    reply_to_jobs: EmailStr | None = None
-    reply_to_login: EmailStr | None = None
-    reply_to_welcome: EmailStr | None = None
+    address: MailAddressSettings
 
 
 class Settings(BaseSettings):

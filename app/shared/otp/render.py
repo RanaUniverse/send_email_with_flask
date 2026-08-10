@@ -71,3 +71,19 @@ def render_otp_email(
         body_text=body_text,
         body_html=body_html,
     )
+
+
+def validate_otp_email_presentation() -> None:
+    """
+    This will validate if i have all the presentation templates
+    i make already or not and then based on this i will throw error
+    """
+    missing = [
+        purpose.value
+        for purpose in OTPPurpose
+        if purpose not in OTP_EMAIL_PRESENTATIONS
+    ]
+    if missing:
+        raise RuntimeError(
+            "Missing OTP Email Presentation TEmplates or somethigns", f"{missing}"
+        )

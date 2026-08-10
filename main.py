@@ -21,9 +21,12 @@ from app.config import settings
 
 from app.features.identity.routes import auth_bp
 from app.features.general.routes import general_bp
+
 # from app.features.mail.routes import mail_bp
 
 from app.shared.extensions import login_manager, csrf
+
+from app.shared.otp.runtime_validation import validate_all_otp_config
 
 
 def create_app() -> Flask:
@@ -49,7 +52,7 @@ def create_app() -> Flask:
 
 if __name__ == "__main__":
     app = create_app()
-
+    validate_all_otp_config()
     print(settings)
     app.run(
         host=settings.app.host,

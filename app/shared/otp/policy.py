@@ -47,3 +47,15 @@ def get_otp_policy_obj(
 
     x = OTP_POLICY_MAP[purpose]
     return x
+
+
+def validate_otp_policies() -> None:
+    """
+    This will raise error if not configured all
+    """
+
+    missing = [purpose.value for purpose in OTPPurpose if purpose not in OTP_POLICY_MAP]
+    if missing:
+        raise RuntimeError("Missing OTP Policies For List Of:" f"{missing}")
+
+

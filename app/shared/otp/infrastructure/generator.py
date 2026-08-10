@@ -36,7 +36,7 @@ class OTPNumberGenerator:
         length: int,
     ) -> str:
         # i will use another login in reality #TODO
-        if length < 0:
+        if length <= 0:
             raise ValueError("Otp should must be greater than zero.")
 
         digits = string.digits
@@ -53,7 +53,7 @@ class OTPAlphabetGenerator:
         self,
         length: int,
     ) -> str:
-        if length < 0:
+        if length <= 0:
             raise ValueError("Otp should must be greater than zero.")
 
         LETTERS = string.ascii_uppercase

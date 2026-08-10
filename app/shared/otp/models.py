@@ -51,8 +51,8 @@ class OTPPolicy(
     length: int = Field(
         description="The Lenght of the otp whcih will be stored or generate "
         "for differnet reasons based on otppurpose",
-        ge=4,
-        le=10,
+        gt=0,
+        lt=100,
     )
 
 

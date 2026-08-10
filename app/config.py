@@ -82,7 +82,7 @@ class Settings(BaseSettings):
     owner_name: str
 
     app: AppSettings
-    mail: MailSettings
+    mail: MailSettings = Field(repr=False)
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -7,24 +7,24 @@ data or message will shows to the user.
 
 from flask import render_template
 
-from .enums import OTPPurpose
 
+from .enums import OTPPurpose
 
 from .models import OTPEmailPresentation, RenderedOTPEmail
 
-OTP_EMAIL_PRESENTATION_DICT: dict[OTPPurpose, OTPEmailPresentation] = {
+OTP_EMAIL_PRESENTATIONS: dict[OTPPurpose, OTPEmailPresentation] = {
     OTPPurpose.REGISTER: OTPEmailPresentation(
-        subject_template="Verify Your email address",
+        subject_template="Register Your Account With Our Service",
         text_template="emails/otp/register.txt",
         html_template="emails/otp/register.html",
     ),
     OTPPurpose.LOGIN: OTPEmailPresentation(
-        subject_template="Your Login verification code",
+        subject_template="Please Login Here With OTP",
         text_template="emails/otp/login.txt",
         html_template="emails/otp/login.html",
     ),
     OTPPurpose.FORGET_PASSWORD: OTPEmailPresentation(
-        subject_template="Password reset verification code",
+        subject_template="Password Forget Request With OTP",
         text_template="emails/otp/forget_password.txt",
         html_template="emails/otp/forget_password.html",
     ),
@@ -47,10 +47,11 @@ def render_otp_email(
     """
 
     try:
-        presentation = OTP_EMAIL_PRESENTATION_DICT[purpose]
+        presentation = OTP_EMAIL_PRESENTATIONS[purpose]
+
     except KeyError as exc:
-        raise ValueError(
-            f"No OTP email presentation configured for: {purpose}"
+        raise RuntimeError(
+            f"No email presentation configured for OTP purpose " f"{purpose.value!r}"
         ) from exc
 
     body_text = render_template(

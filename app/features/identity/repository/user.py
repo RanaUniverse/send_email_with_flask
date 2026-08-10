@@ -1,8 +1,10 @@
 """
-app/features/identity/user.py
+app/features/identity/repository/user.py
 
-Here i will user related settings
+Here i will keep user related data of how the user checking will be done
 """
+
+from pydantic import EmailStr
 
 from flask_login import UserMixin  # type: ignore
 
@@ -63,3 +65,27 @@ USER_: dict[str, User] = {
         password="r",
     ),
 }
+
+
+class UserRepository:
+    """
+    This is have user related information extract methods
+    """
+
+    def get_by_email(
+        self,
+        email: EmailStr,
+    ) -> User | None:
+
+        for user in USER_.values():
+            if user.email == email:
+                return user
+
+        return None
+
+    def exists_by_email(
+        self,
+        email: EmailStr,
+    ) -> bool:
+
+        return self.get_by_email(email) is not None

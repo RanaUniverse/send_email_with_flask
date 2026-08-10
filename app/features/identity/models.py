@@ -7,7 +7,12 @@ This will have the models or data to keep for this related thigns
 from pydantic import BaseModel
 
 
-from .enums import RegistrationStatus, AfterRegistrationNextStep
+from .enums import (
+    RegistrationStatus,
+    AfterRegistrationNextStep,
+    RegistrationOTPStatus,
+    RegistrationOTPStatusNextStep,
+)
 
 
 class RegistrationResult(BaseModel):
@@ -26,3 +31,21 @@ class RegistrationResult(BaseModel):
 
         x = self.status == RegistrationStatus.OTP_SENT
         return x
+
+
+class RegistrationViaOTPResult(BaseModel):
+    """
+    I will next_step = none when this will be decide by the routes.py
+    """
+
+    status: RegistrationOTPStatus
+    next_step: RegistrationOTPStatusNextStep | None = None
+
+    def success(
+        self,
+    ) -> bool:
+        """
+        This will say true if register has the status of success
+        """
+        r = self.status == RegistrationOTPStatus.VERIFIED
+        return r

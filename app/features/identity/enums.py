@@ -7,12 +7,6 @@ Here i will keep the needed thigns to easily access this
 from enum import StrEnum
 
 
-class AfterRegistrationNextStep(StrEnum):
-    ENTER_PASSWORD = "enter_password"
-    VERIFY_OTP = "verify_otp"
-    SHOW_ERROR = "show_error"
-
-
 class RegistrationStatus(StrEnum):
     OTP_SENT = "otp_sent"
 
@@ -23,3 +17,23 @@ class RegistrationStatus(StrEnum):
     ATTEMPT_LIMIT_EXCEED = "attempt_limit_exceed"
 
     EMAIL_SERVICE_FAILED = "email_service_failed"
+
+
+class AfterRegistrationNextStep(StrEnum):
+    ENTER_PASSWORD = "enter_password"
+    VERIFY_OTP = "verify_otp"
+    SHOW_ERROR = "show_error"
+
+
+class RegistrationOTPStatus(StrEnum):
+
+    VERIFIED = "verified"
+    INVALID_OTP = "invalid_otp"
+    OTP_NOT_FOUND = "otp_not_found"
+    ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"
+
+
+class RegistrationOTPStatusNextStep(StrEnum):
+    SET_PASSWORD = "set_password"
+    RETRY_OTP = "retry_otp"
+    RESTART_REGISTRATION = "restart_registration"

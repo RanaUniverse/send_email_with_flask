@@ -7,6 +7,7 @@ i will import this obj in differnet places this will just nothing do else
 """
 
 import redis
+from redis.exceptions import RedisError
 
 
 from app.config import settings
@@ -29,3 +30,20 @@ redis_client = redis.Redis(
     decode_responses=True,
     credential_provider=id_pass_credential_obj,
 )
+
+
+def validate_redis_connection() -> None:
+    """
+    i will call this at startup so that i will sure Redis will
+    connect goodly correctly or not
+    """
+    print("Redis Connection is Checking with AUTH...")
+
+    try:
+        redis_client.ping()  # type: ignore
+        print("Redis Connection Has Successfull.")
+    except RedisError as e:
+        raise RuntimeError(
+            "Redis startup check failed now "
+            "Check redis url, host, port , username, password"
+        ) from e

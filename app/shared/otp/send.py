@@ -99,9 +99,15 @@ class OTPSendService:
             ttl_seconds=otp_policy_obj.validity,
         )
 
-        self._attempt.reset(
+        # self._attempt.reset(
+        #     identifier=identifier,
+        #     purpose=purpose,
+        # )
+
+        self._attempt.start(
             identifier=identifier,
             purpose=purpose,
+            ttl_seconds=otp_policy_obj.cooldown,
         )
 
         self._cooldown.start(

@@ -55,3 +55,17 @@ class OTPAttemptTracker(Protocol):
         so that after new otp generate the old attempts not counts
         """
         ...
+
+    def start(
+        self,
+        *,
+        identifier: str,
+        purpose: OTPPurpose,
+        ttl_seconds: int,
+    ) -> None:
+        """
+        Thsi will make the attempt_count = 0
+        I make this so that it will start with 0 and later i will only
+        increment this value to get increase based on user wrong input
+        """
+        ...

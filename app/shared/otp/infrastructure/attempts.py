@@ -70,7 +70,10 @@ class RedisAttemptTracker:
         """
         For wrong attempt it will increment an attmept
         """
-        key = self._make_key(identifier=identifier, purpose=purpose)
+        key = self._make_key(
+            identifier=identifier,
+            purpose=purpose,
+        )
         self._redis.incr(key)
 
     def reset(
@@ -83,8 +86,32 @@ class RedisAttemptTracker:
         This will reset the attempts to 0
         so that after new otp generate the old attempts not counts
         """
-        key = self._make_key(identifier=identifier, purpose=purpose)
+        key = self._make_key(
+            identifier=identifier,
+            purpose=purpose,
+        )
         self._redis.delete(key)
+
+    def start(
+        self,
+        *,
+        identifier: str,
+        purpose: OTPPurpose,
+        ttl_seconds: int,
+    ) -> None:
+        """
+        Thsi will make the attempt_count = 0
+        so that it can be auto expired with time of otp expire
+        """
+        key = self._make_key(
+            identifier=identifier,
+            purpose=purpose,
+        )
+        self._redis.set(
+            name=key,
+            value=0,
+            ex=ttl_seconds,
+        )
 
 
 class LocalOTPAttemptTracker:
@@ -115,5 +142,13 @@ class LocalOTPAttemptTracker:
         *,
         identifier: EmailStr,
         purpose: OTPPurpose,
+    ) -> None:
+        pass
+
+    def start(
+        *,
+        identifier: str,
+        purpose: OTPPurpose,
+        ttl_seconds: int,
     ) -> None:
         pass

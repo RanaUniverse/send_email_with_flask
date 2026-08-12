@@ -56,11 +56,13 @@ class OTPVerifyService:
             identifier=identifier,
             purpose=purpose,
         )
+
         if stored_otp is None:
             return OTPVerifyResult(
                 status=OTPVerifyStatus.OTP_NOT_FOUND,
                 message="No OTP is found maybe not exists or expired",
             )
+
         if submitted_otp != stored_otp:
             self._attempt.increment(
                 identifier=identifier,

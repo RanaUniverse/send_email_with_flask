@@ -11,11 +11,12 @@ from pydantic import EmailStr
 
 
 from app.shared.otp.send import OTPSendService
+from app.shared.otp.verify import OTPVerifyService
+
 from app.shared.otp.models import (
     OTPSendResult,
     OTPVerifyResult,
 )
-from app.config import settings
 
 from app.shared.otp.factory import (
     otp_componenet_objects,
@@ -25,7 +26,6 @@ from app.shared.mail.factory import mail_sender_obj
 
 from app.shared.otp.enums import (
     OTPPurpose,
-    OTPVerifyStatus,
 )
 
 
@@ -65,22 +65,30 @@ def verify_otp_against_email(
     This will take the email_id and then validate those
     against the otp given by the user
     """
-    # otp_storage_obj = otp_componenet_objects.storage
+
+    s = OTPVerifyService(
+        attempt=otp_componenet_objects.attempt,
+        storage=otp_componenet_objects.storage,
+    )
+
+    otp_checking = s.execute(
+        identifier=email,
+        purpose=purpose,
+        submitted_otp=submitted_otp,
+    )
+
+    return otp_checking
 
     # now for demo i am retgurning from local here demo data
     # later i will check from the execute methods from the otp shared thigns
 
-    if settings.app.validation_mode == "PRODUCTION":
-        raise RuntimeError(
-            "This otp checking is not made yet",
-        )
+    # if settings.app.validation_mode == "PRODUCTION":
+    #     raise RuntimeError(
+    #         "This otp checking is not made yet",
+    #     )
 
-    if email == "a@gmail.com" and submitted_otp == "123456":
+    # if email == "a@gmail.com" and submitted_otp == "123456":
 
-        return OTPVerifyResult(
-            status=OTPVerifyStatus.VERIFIED,
-        )
-
-    return OTPVerifyResult(
-        status=OTPVerifyStatus.INVALID_OTP,
-    )
+    # return OTPVerifyResult(
+    #     status=OTPVerifyStatus.INVALID_OTP,
+    # )

@@ -13,7 +13,7 @@ from .interfaces.cooldown import OTPCooldown
 from .interfaces.generator import OTPGenerator
 from .interfaces.storage import OTPStorage
 
-from .infrastructure.attempts import LocalOTPAttemptTracker
+from .infrastructure.attempts import LocalOTPAttemptTracker, RedisAttemptTracker
 from .infrastructure.blocklist import LocalInMemoryBlocklist, RedisBlocklist
 from .infrastructure.cooldown import LocalCooldown, RedisCooldown
 from .infrastructure.generator import OTPNumberGenerator
@@ -24,6 +24,9 @@ from ..redis.client import redis_client
 
 
 def create_otp_attempt_tracker() -> OTPAttemptTracker:
+    return RedisAttemptTracker(
+        redis_client=redis_client,
+    )
     return LocalOTPAttemptTracker()
 
 

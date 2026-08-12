@@ -16,3 +16,8 @@ dependencies = [
     "sqlmodel>=0.0.39",
     "wtforms[email]>=3.2.2",
 ]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.411",
+]

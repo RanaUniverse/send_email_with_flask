@@ -13,14 +13,14 @@ from .enums import OTPPurpose
 from .models import OTPPolicy
 
 register_policy = OTPPolicy(
-    validity=60,
+    validity=600,
     cooldown=60,
     max_attempts=5,
     length=4,
 )
 
 login_policy = OTPPolicy(
-    validity=120,
+    validity=300,
     cooldown=30,
     max_attempts=5,
     length=6,

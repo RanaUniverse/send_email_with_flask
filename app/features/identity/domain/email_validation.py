@@ -14,7 +14,9 @@ from ..exceptions import InvalidEmailError
 
 class ValidatedEmail:
     """
-    It can reaise InvalidEmailError from exceptions.py
+
+    Raise
+    InvalidEmailError from exceptions.py
     """
 
     def __init__(
@@ -22,6 +24,7 @@ class ValidatedEmail:
         email_id: str,
     ) -> None:
         try:
+            # below model will check my mail domain to allow or not
             model = EmailModel(
                 value=email_id,
             )

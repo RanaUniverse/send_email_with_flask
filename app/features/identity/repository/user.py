@@ -31,11 +31,12 @@ class User(UserMixin):
         return str(self.id_)
 
 
+# This is a demo database to check if user is already register or not
 USER_: dict[str, User] = {
     "1": User(
         1,
         "john",
-        "john@gmail.com",
+        "a@gmail.com",
         "8989899889",
         balance=500,
         password="a",
@@ -43,7 +44,7 @@ USER_: dict[str, User] = {
     "2": User(
         2,
         "roman",
-        "roman@reigns.com",
+        "b@gmail.com",
         "5665565665",
         balance=600,
         password="b",
@@ -51,11 +52,13 @@ USER_: dict[str, User] = {
     "3": User(
         3,
         "brock",
-        "brock@lesnar.com",
+        "c@gmail.com",
         "2323233223",
         balance=700,
         password="c",
     ),
+    # below user 4 should not valid as my business email domain not
+    # support the @r.com domain so this should not handle as blocked email
     "4": User(
         4,
         "rana",
@@ -88,4 +91,5 @@ class UserRepository:
         email: EmailStr,
     ) -> bool:
 
-        return self.get_by_email(email) is not None
+        r = self.get_by_email(email) is not None
+        return r

@@ -163,7 +163,9 @@ def login_with_password():
 )
 def register():
     """
-    this page is for showing registerariotn page
+    this page is for showing registerariotn page to user
+    and if registion data submitted then this will shows
+    the user the way of verify otp like this
     """
     form = RegisterForm()
 
@@ -221,8 +223,6 @@ def register():
                     "auth_bp.register",
                 )
             )
-
-        # i wnat to send otp if the email is right where i shoudl to do i wnat to use ddd and how?
 
     else:
         for field, errors in form.errors.items():

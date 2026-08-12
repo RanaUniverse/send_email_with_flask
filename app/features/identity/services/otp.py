@@ -78,17 +78,3 @@ def verify_otp_against_email(
     )
 
     return otp_checking
-
-    # now for demo i am retgurning from local here demo data
-    # later i will check from the execute methods from the otp shared thigns
-
-    # if settings.app.validation_mode == "PRODUCTION":
-    #     raise RuntimeError(
-    #         "This otp checking is not made yet",
-    #     )
-
-    # if email == "a@gmail.com" and submitted_otp == "123456":
-
-    # return OTPVerifyResult(
-    #     status=OTPVerifyStatus.INVALID_OTP,
-    # )

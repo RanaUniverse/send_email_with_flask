@@ -16,6 +16,7 @@ class EmailModel(BaseModel):
     @field_validator("value")
     @classmethod
     def allowed_providers(cls, email: EmailStr):
+        # i will later say to come this domains from the env variables or db
         allowed_domains = {
             "gmail.com",
             "hotmail.com",

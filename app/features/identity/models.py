@@ -16,6 +16,10 @@ from .enums import (
 
 
 class RegistrationResult(BaseModel):
+    """
+    This is for Frontend, this result will use by routes.py
+    to check where to redirect the user based on the result
+    """
 
     status: RegistrationStatus
     next_step: AfterRegistrationNextStep

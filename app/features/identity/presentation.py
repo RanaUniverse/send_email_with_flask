@@ -7,13 +7,19 @@ This is for taking the data from the service and make this
 to usable ui text to shows to user via routes.py
 """
 
+from wtforms.validators import Length
+
+
 from pydantic import BaseModel
 
 
 from .enums import RegistrationStatus
+from .forms import OTPForm
 from .models import RegistrationResult
 
 from app.shared.frontend.enums import FlashCategory
+from app.shared.otp.enums import OTPPurpose
+from app.shared.otp.policy import get_otp_policy_obj
 
 
 class PresentationMessageFlask(BaseModel):
@@ -76,3 +82,20 @@ def registration_to_flash(
     raise RuntimeError(
         f"Unhandled registration status: {result.status}",
     )
+
+
+def configure_registration_otp_form(
+    form: OTPForm,
+) -> OTPForm:
+
+    policy = get_otp_policy_obj(
+        purpose=OTPPurpose.REGISTER,
+    )
+    form.otp.label.text = f"Enter {policy.length} Digit OTP"
+    form.otp.validators.append(  # type: ignore
+        Length(
+            min=policy.length,
+            max=policy.length,
+        )
+    )
+    return form

@@ -26,7 +26,7 @@ from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from .services.services import check_authentication
 from .dependencies import registration_service_obj
-from .presentation import registration_to_flash
+from .presentation import registration_to_flash, configure_registration_otp_form
 
 from .enums import AfterRegistrationNextStep
 
@@ -201,6 +201,7 @@ def register():
         if register.next_step == AfterRegistrationNextStep.VERIFY_OTP:
 
             session["pending_email"] = form.email.data
+            # form.here i will chagne to number =4 or what
 
             return redirect(
                 url_for(
@@ -245,7 +246,6 @@ def register():
 def verify_otp():
 
     email = session.get("pending_email")
-    form = OTPForm()
 
     if email is None:
         flash(
@@ -257,6 +257,13 @@ def verify_otp():
                 "auth_bp.register",
             )
         )
+
+    form = OTPForm()
+
+    # This will change the otp validation of the registration otp number
+    form = configure_registration_otp_form(
+        form=form,
+    )
 
     if form.validate_on_submit():  # type: ignore
 
@@ -276,6 +283,7 @@ def verify_otp():
                 message=str(e),
                 category="danger",
             )
+
             return render_template(
                 "auth/verify_otp.html",
                 form=form,
@@ -287,6 +295,7 @@ def verify_otp():
                 "OTP verified successfully.",
                 "success",
             )
+
             flash(
                 "You Are LOG In Successfully",
                 "success",

@@ -71,8 +71,8 @@ class OTPForm(FlaskForm):
         validators=[
             DataRequired(),
             Length(
-                min=4,
-                max=10,
+                min=1,
+                max=100,
             ),
         ],
     )

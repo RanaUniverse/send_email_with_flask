@@ -44,6 +44,9 @@ OTP_POLICY_MAP = {
 def get_otp_policy_obj(
     purpose: OTPPurpose,
 ) -> OTPPolicy:
+    """
+    i will run this fun always to get the policy obj
+    """
 
     x = OTP_POLICY_MAP[purpose]
     return x
@@ -57,5 +60,3 @@ def validate_otp_policies() -> None:
     missing = [purpose.value for purpose in OTPPurpose if purpose not in OTP_POLICY_MAP]
     if missing:
         raise RuntimeError("Missing OTP Policies For List Of:" f"{missing}")
-
-

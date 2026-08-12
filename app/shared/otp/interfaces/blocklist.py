@@ -15,6 +15,9 @@ class BlockList(Protocol):
     """
     1. is_blocked()
 
+    I think to use a set in redis so that i can use this
+    and do block and unblock the users
+
     Here i will want to have block some user or not
     and then also return if a user is blocked or not
     """

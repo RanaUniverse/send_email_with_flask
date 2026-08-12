@@ -27,7 +27,6 @@ from app.features.general.routes import general_bp
 from app.shared.extensions import login_manager, csrf
 
 from app.shared.otp.runtime_validation import validate_all_otp_config
-from app.shared.redis.client import validate_redis_connection
 
 
 def create_app() -> Flask:
@@ -47,10 +46,6 @@ def create_app() -> Flask:
     app.register_blueprint(blueprint=auth_bp)
     app.register_blueprint(blueprint=general_bp)
     # app.register_blueprint(blueprint=mail_bp)
-
-    # i will change the logic here so that this will only check when
-    # i am using redis else in local or another thsi will not run
-    validate_redis_connection()
 
     validate_all_otp_config()
     return app

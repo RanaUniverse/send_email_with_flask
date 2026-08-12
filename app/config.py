@@ -81,6 +81,14 @@ class MailSettings(BaseModel):
     address: MailAddressSettings
 
 
+class OTPSettings(BaseModel):
+
+    backend: Literal[
+        "local",
+        "redis",
+    ]
+
+
 class RedisSettings(BaseModel):
     """
     Redis config will be here
@@ -99,6 +107,7 @@ class Settings(BaseSettings):
 
     app: AppSettings
     mail: MailSettings = Field(repr=False)
+    otp: OTPSettings
     redis: RedisSettings
 
     model_config = SettingsConfigDict(

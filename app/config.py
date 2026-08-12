@@ -63,7 +63,10 @@ class MailSettings(BaseModel):
     and from email is my email id other will see
     """
 
-    provider: Literal["local", "smtp"]
+    provider: Literal[
+        "local",
+        "smtp",
+    ]
     # how i can say it value wil lonly, "local" or "smtp"
 
     host: str
@@ -78,11 +81,25 @@ class MailSettings(BaseModel):
     address: MailAddressSettings
 
 
+class RedisSettings(BaseModel):
+    """
+    Redis config will be here
+    """
+
+    host: str = "localhost"
+    port: int = 6379
+    db: int = 0
+
+    username: str | None = None
+    password: SecretStr | None = None
+
+
 class Settings(BaseSettings):
     owner_name: str
 
     app: AppSettings
     mail: MailSettings = Field(repr=False)
+    redis: RedisSettings
 
     model_config = SettingsConfigDict(
         env_file=".env",

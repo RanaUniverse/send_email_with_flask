@@ -14,10 +14,13 @@ from .interfaces.generator import OTPGenerator
 from .interfaces.storage import OTPStorage
 
 from .infrastructure.attempts import LocalOTPAttemptTracker
-from .infrastructure.blocklist import LocalInMemoryBlocklist
-from .infrastructure.cooldown import LocalCooldown
+from .infrastructure.blocklist import LocalInMemoryBlocklist, RedisBlocklist
+from .infrastructure.cooldown import LocalCooldown, RedisCooldown
 from .infrastructure.generator import OTPNumberGenerator
-from .infrastructure.storage import LocalTestingOTPStorage
+from .infrastructure.storage import LocalTestingOTPStorage, RedisOTPStorage
+
+
+from ..redis.client import redis_client
 
 
 def create_otp_attempt_tracker() -> OTPAttemptTracker:
@@ -25,6 +28,9 @@ def create_otp_attempt_tracker() -> OTPAttemptTracker:
 
 
 def create_otp_cooldown() -> OTPCooldown:
+    return RedisCooldown(
+        redis_client=redis_client,
+    )
     return LocalCooldown()
 
 
@@ -33,6 +39,11 @@ def create_otp_generator() -> OTPGenerator:
 
 
 def create_otp_storage() -> OTPStorage:
+
+    return RedisOTPStorage(
+        redis_client=redis_client,
+    )
+
     return LocalTestingOTPStorage()
 
 
@@ -40,6 +51,9 @@ def create_blocklist_email() -> BlockList:
     """
     For now locally development it send later i will use real db
     """
+    return RedisBlocklist(
+        redis_client=redis_client,
+    )
     return LocalInMemoryBlocklist()
 
 

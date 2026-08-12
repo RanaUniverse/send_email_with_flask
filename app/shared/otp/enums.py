@@ -13,6 +13,8 @@ class OTPPurpose(StrEnum):
     How the differentiate will be between login/register and
     the purpose of the otp generation will be here
 
+    .value will give me the value here defined
+
     After adding New OTPPurpose i need to check and
     add the email presentation and others cases.
     """

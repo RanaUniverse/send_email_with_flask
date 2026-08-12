@@ -1,6 +1,5 @@
 """
 app/features/mail/__init__.py
 
-Here i will make keep the mail sending related logics
+This is obsolate, i will not use this anythign until i will make any decession
 """
-

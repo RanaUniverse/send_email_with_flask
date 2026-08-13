@@ -26,9 +26,13 @@ from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from .services.services import check_authentication
 from .dependencies import registration_service_obj
-from .presentation import registration_to_flash, configure_registration_otp_form
+from .presentation import registration_to_flash
 
 from .enums import AfterRegistrationNextStep
+
+
+from app.shared.otp.policy import get_otp_policy_obj
+from app.shared.otp.enums import OTPPurpose
 
 # TODO  i will later change this to call the service which will call the otp
 
@@ -257,12 +261,12 @@ def verify_otp():
                 "auth_bp.register",
             )
         )
+    obj = get_otp_policy_obj(
+        purpose=OTPPurpose.REGISTER,
+    )
 
-    form = OTPForm()
-
-    # This will change the otp validation of the registration otp number
-    form = configure_registration_otp_form(
-        form=form,
+    form = OTPForm(
+        otp_length=obj.length,
     )
 
     if form.validate_on_submit():  # type: ignore

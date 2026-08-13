@@ -52,6 +52,8 @@
                             class="form-control form-control-lg text-center",
                             placeholder="Enter OTP",
                             autocomplete="one-time-code",
+                            inputmode="numeric",
+                            pattern="[0-9]*",
                             ) }}
 
                             {% for error in form.otp.errors %}

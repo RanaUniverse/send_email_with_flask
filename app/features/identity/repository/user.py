@@ -93,3 +93,43 @@ class UserRepository:
 
         r = self.get_by_email(email) is not None
         return r
+
+    def add(
+        self,
+        username: str,
+        email: EmailStr,
+        phone: str,
+        balance: float,
+        password: str,
+    ) -> User:
+
+        if self.exists_by_email(email):
+            raise ValueError(
+                "User with this email already exists",
+            )
+
+        new_id = str(
+            max(
+                map(
+                    int,
+                    USER_.keys(),
+                ),
+                default=0,
+            )
+            + 1,
+        )
+
+        user = User(
+            id_=new_id,
+            username=username,
+            email=str(email),
+            phone=phone,
+            balance=balance,
+            password=password,
+        )
+
+        USER_[new_id] = user
+        print("NEW DATA")
+        print(USER_, user)
+        print("NEW DATA")
+        return user

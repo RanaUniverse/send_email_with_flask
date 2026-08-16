@@ -4,6 +4,13 @@ app/features/identity/services/registration.py
 Registration related code fun and so on will be present here
 """
 
+import string
+import secrets
+
+
+from pydantic import EmailStr
+
+
 from app.shared.otp.enums import (
     OTPPurpose,
     OTPSendStatus,
@@ -24,7 +31,7 @@ from ..models import (
 )
 
 from .otp import send_otp_to_email, verify_otp_against_email
-from ..repository.user import UserRepository
+from ..repository.user import UserRepository, User
 
 
 class RegistrationService:
@@ -168,3 +175,29 @@ class RegistrationService:
         return RegistrationViaOTPResult(
             status=RegistrationOTPStatus.INVALID_OTP,
         )
+
+    def add_user_to_db(
+        self,
+        email: EmailStr,
+    ) -> User:
+
+        random_part = secrets.token_hex(3)
+        fake_username = f"user_{random_part}"
+
+        fake_phone = "9" + "".join(secrets.choice(string.digits) for _ in range(9))
+
+        fake_password = "".join(
+            secrets.choice(string.ascii_letters + string.digits) for _ in range(16)
+        )
+
+        fake_balance = 0.0
+
+        new_user = self._user_repository.add(
+            username=fake_username,
+            email=email,
+            phone=fake_phone,
+            balance=fake_balance,
+            password=fake_password,
+        )
+
+        return new_user

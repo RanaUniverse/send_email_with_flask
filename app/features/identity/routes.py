@@ -26,7 +26,7 @@ from .exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from .services.services import check_authentication
 from .dependencies import registration_service_obj
-from .presentation import registration_to_flash
+from .presentation import registration_to_flash, FlashCategory
 
 from .enums import AfterRegistrationNextStep
 
@@ -49,6 +49,7 @@ auth_bp = Blueprint(
     methods=["GET", "POST"],
 )
 def login():
+
     form = LoginForm()
 
     if form.validate_on_submit():  # type: ignore
@@ -253,18 +254,18 @@ def verify_otp():
 
     if email is None:
         flash(
-            "You Need to register and then come to verify",
-            "danger",
+            message="First Register Your Account with Email ID",
+            category=FlashCategory.WARNING,
         )
         return redirect(
             url_for(
                 "auth_bp.register",
             )
         )
+
     obj = get_otp_policy_obj(
         purpose=OTPPurpose.REGISTER,
     )
-
     form = OTPForm(
         otp_length=obj.length,
     )
@@ -274,9 +275,6 @@ def verify_otp():
         otp = form.otp.data or ""
 
         try:
-
-            # at the time of registration i saved the pending_email in
-            # the sesion so i check this value here to get the email and then otp here
             verify = registration_service_obj.verify_registration_otp(
                 email=email,
                 submitted_otp=otp,
@@ -285,7 +283,7 @@ def verify_otp():
         except InvalidEmailError as e:
             flash(
                 message=str(e),
-                category="danger",
+                category=FlashCategory.DANGER,
             )
 
             return render_template(
@@ -294,6 +292,12 @@ def verify_otp():
             )
 
         if verify.success():
+
+            new_user = registration_service_obj.add_user_to_db(
+                email=email,
+            )
+
+            login_user(user=new_user)
 
             flash(
                 "OTP verified successfully.",

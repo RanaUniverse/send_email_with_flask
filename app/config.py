@@ -102,12 +102,78 @@ class RedisSettings(BaseModel):
     password: SecretStr | None = None
 
 
+class DatabaseSettings(BaseModel):
+    """
+    Database related maybe i will use postgres or sqlite
+    so their configurations i will write here
+
+    For Sqlite i will just use the default things.
+    For Postgres i will use all the username, password,
+    host, port, name should be given
+    """
+
+    backend: Literal[
+        "sqlite",
+        "postgres",
+    ] = "sqlite"
+
+    sqlite_filename: str = "local_database.db"
+
+    username: str | None = None
+    password: SecretStr | None = None
+    host: str | None = None
+    port: int | None = None
+    name: str | None = None
+
+    @property
+    def db_url(self) -> str:
+        if self.backend == "postgres":
+            if (
+                self.username is None
+                or self.password is None
+                or self.host is None
+                or self.port is None
+                or self.name is None
+            ):
+                raise RuntimeError(
+                    f"For Postgresql the value of all DB "
+                    "Connections this must be not None",
+                )
+
+            POSTGRES_URL = (
+                f"postgresql+psycopg2://"
+                f"{self.username}:"
+                f"{self.password.get_secret_value()}@"
+                f"{self.host}:"
+                f"{self.port}/"
+                f"{self.name}"
+            )
+            return POSTGRES_URL
+
+        elif self.backend == "sqlite":
+            sqlite_filepath = self.sqlite_filename
+            SQLITE_URL = f"sqlite:///" f"{sqlite_filepath}"
+            return SQLITE_URL
+
+        else:
+            raise RuntimeError(
+                "Database should be sqlite or postgres for now",
+            )
+
+
 class Settings(BaseSettings):
+    """
+    db: DatabaseSettings = DatabaseSettings()
+    I give this because when not any default values set for the db
+    it will make the class instance and use this values there!
+    """
+
     owner_name: str
 
     app: AppSettings
     mail: MailSettings = Field(repr=False)
     otp: OTPSettings
+    db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings
 
     model_config = SettingsConfigDict(
@@ -127,3 +193,4 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+print(settings.db.db_url)

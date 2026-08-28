@@ -1,5 +1,6 @@
 """
 app/features/identity/presentation.py
+app/features/identity/presentation/message.py
 
 This say how the UI will displayed.
 
@@ -10,8 +11,8 @@ to usable ui text to shows to user via routes.py
 from pydantic import BaseModel
 
 
-from .enums import RegistrationStatus
-from .models import RegistrationResult
+from ..domain.enums import RegistrationStatus
+from ..application.registration.dto import RegistrationResult
 
 from app.shared.frontend.enums import FlashCategory
 

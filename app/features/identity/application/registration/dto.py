@@ -7,7 +7,7 @@ This will have the models or data to keep for this related thigns
 from pydantic import BaseModel
 
 
-from .enums import (
+from ...domain.enums import (
     RegistrationStatus,
     AfterRegistrationNextStep,
     RegistrationOTPStatus,
@@ -45,6 +45,7 @@ class RegistrationViaOTPResult(BaseModel):
     status: RegistrationOTPStatus
     next_step: RegistrationOTPStatusNextStep | None = None
 
+    @property
     def success(
         self,
     ) -> bool:

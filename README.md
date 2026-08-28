@@ -47,3 +47,9 @@ I will mainly use celery to do the task in background.
 ## Email Sending Logic:
 For Nornmal user the email will send through my own `email` and `password`, and then when a login user login and give there own `email` and `password` to my service my backend will store this id password and for this user sending email page it will take the same to_email, subject, body but send the email based on his own email config.
 i want to do this.
+
+## How The Registration will work:
+0. -> It will check email validation and shows him what to do progress or not.
+1. User enters the email id, it will first check if user is already exists, if yes shows him login page with password or otp based on what user has choosed.
+2. If Not:- Send Him otp by calling otp service.
+3. Routes will call RegistrationService.start_registration() -> Which will do all the logic applied to this.

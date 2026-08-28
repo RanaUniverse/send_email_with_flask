@@ -49,7 +49,7 @@ def send_otp_to_email(
     )
 
     mail_send = s.execute(
-        identifier=email_id,
+        identifier=email_id  ,
         purpose=purpose,
     )
 

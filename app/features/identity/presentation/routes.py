@@ -22,13 +22,13 @@ from flask_login import (  # type: ignore
 )
 
 
-from .exceptions import InvalidEmailError
+from ..domain.exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
-from .services.services import check_authentication
-from .dependencies import registration_service_obj
-from .presentation import registration_to_flash, FlashCategory
+from ..services.services import check_authentication
+from ..dependencies import registration_service_obj
+from .message import registration_to_flash, FlashCategory
 
-from .enums import AfterRegistrationNextStep
+from ..domain.enums import AfterRegistrationNextStep
 
 
 from app.shared.otp.policy import get_otp_policy_obj

@@ -119,7 +119,6 @@ class OTPForm(FlaskForm):
             **(self.otp.render_kw or {}),
             "minlength": str(min_len),
             "maxlength": str(max_len),
-            
         }
 
         self.otp.label.text = label

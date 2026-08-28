@@ -16,16 +16,16 @@ from app.shared.otp.enums import (
     OTPSendStatus,
 )
 
-from ..domain.email_validation import ValidatedEmail
-from ..exceptions import InvalidEmailError
+from ..domain.value_objects.email_validation import ValidatedEmail
+from ..domain.exceptions import InvalidEmailError
 
-from ..enums import (
+from ..domain.enums import (
     AfterRegistrationNextStep,
     RegistrationOTPStatus,
     RegistrationStatus,
 )
 
-from ..models import (
+from ..application.registration.dto import (
     RegistrationResult,
     RegistrationViaOTPResult,
 )
@@ -38,6 +38,8 @@ class RegistrationService:
     """
     This will have all the registration related things
     fucntion and checking form this
+
+    The user_repository valeu will come as dependency
     """
 
     def __init__(

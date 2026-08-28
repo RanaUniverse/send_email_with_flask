@@ -33,7 +33,13 @@ class AppSettings(BaseModel):
     validation_mode: Literal[
         "DEVELOPMENT",
         "PRODUCTION",
-    ]
+    ] = "DEVELOPMENT"
+
+    login_backend: Literal[
+        "SQLMODEL",
+        "MONGODB",
+        "MEMORY",
+    ] = "SQLMODEL"
 
 
 class MailAddressSettings(BaseModel):

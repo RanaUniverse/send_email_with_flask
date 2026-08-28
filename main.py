@@ -19,7 +19,7 @@ from flask import Flask
 
 from app.config import settings
 
-from app.features.identity.routes import auth_bp
+from app.features.identity.presentation.routes import auth_bp
 from app.features.general.routes import general_bp
 
 # from app.features.mail.routes import mail_bp

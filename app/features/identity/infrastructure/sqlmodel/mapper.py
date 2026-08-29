@@ -6,11 +6,11 @@ This is for convert my models to business need like this
 
 from ...domain.entities.user import UserDomain
 
-from .models import UserOutForDomainEntity, UserModel
+from .models import UserModel
 
 
 def to_domain(
-    model_obj: UserOutForDomainEntity,
+    model_obj: UserModel,
 ) -> UserDomain:
     """
     from the sqlmodel database user to my business entities

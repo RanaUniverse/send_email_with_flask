@@ -83,16 +83,18 @@ class UserUpdate(SQLModel):
     password: str | None = None
 
 
-class UserOutForDomainEntity(UserBase):
-    """
-    I make this as a extra security so that any extra
-    information dont need to leak to the other service.
-    For now my login entity will take this values
-    """
+# For now i delete this as i think to use the UserModel class to verify
+# and convert to and from that
+# class UserOutForDomainEntity(UserBase):
+#     """
+#     I make this as a extra security so that any extra
+#     information dont need to leak to the other service.
+#     For now my login entity will take this values
+#     """
 
-    id_: str
-    email: str
-    hashed_password: str
+#     id_: str
+#     email: str
+#     hashed_password: str
 
-    is_active: bool = True
-    is_verified: bool = False
+#     is_active: bool = True
+#     is_verified: bool = False

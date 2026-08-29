@@ -54,6 +54,7 @@ class ValidatedEmail:
             )
 
         except InvalidEmailError:
+            # this exception can raised because of the EmailModel class can do this
             raise
 
         except ValidationError:

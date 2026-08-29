@@ -81,19 +81,19 @@ class InMemoryUserRepository:
 
         return user
 
-    def update(
-        self,
-        user: UserDomain,
-    ) -> UserDomain:
+    # def update(
+    #     self,
+    #     user: UserDomain,
+    # ) -> UserDomain:
 
-        if user.id_ not in USER_:
-            raise ValueError(
-                f"User with id {user.id_} does not exist",
-            )
+    #     if user.id_ not in USER_:
+    #         raise ValueError(
+    #             f"User with id {user.id_} does not exist",
+    #         )
 
-        USER_[user.id_] = user
+    #     USER_[user.id_] = user
 
-        return user
+    #     return user
 
 
 # from pydantic import EmailStr

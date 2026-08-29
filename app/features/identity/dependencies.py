@@ -32,7 +32,8 @@ from app.config import settings
 
 from .domain.repositories.user_repository import UserRepository
 
-from .services.registration import RegistrationService
+from .application.registration.service import RegistrationService
+from .application.login.service import LoginService
 
 from .infrastructure.sqlmodel.user_repository import SQLModelUserRepository
 from .infrastructure.in_memory.user_repository import InMemoryUserRepository
@@ -113,10 +114,29 @@ def get_registration_service(
     )
 
 
+def get_login_service(
+    user_repository: UserRepositoryDep,
+) -> LoginService:
+    """
+    I need to call this aas a Depends() function
+    """
+    return LoginService(
+        user_repository=user_repository,
+    )
+
+
 # i will call this below in the routes.py' function
 RegistrationServiceDep = Annotated[
     RegistrationService,
     Depends(
         get_registration_service,
+    ),
+]
+
+
+LoginServiceDep = Annotated[
+    LoginService,
+    Depends(
+        get_login_service,
     ),
 ]

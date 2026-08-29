@@ -9,7 +9,7 @@ for the sqlmodel i will write code here
 """
 
 # i am using the below class as a protocol to make this below
-# from ...domain.repositories.user_repository import UserRepository
+from ...domain.repositories.user_repository import UserRepository
 
 from ...domain.entities.user import UserDomain
 
@@ -20,19 +20,71 @@ from .mapper import to_domain, to_model
 from .models import UserModel
 
 
-class SQLModelUserRepository:
+class SQLModelUserRepository(UserRepository):
+    """
+    I just inherit from the UserRepository just for know what i am doing
+
+    The session will come by the Dependency injection of Depends
+    so i will not need to use with context manager.
+
+    These methods actually returns the actual datamodel of entity
+    so i need to think and know is this correct for ddd #TODO
+    """
+
     def __init__(
         self,
         session: Session,
     ) -> None:
-        pass
+        self._session = session
 
-    def get_by_id(self, user_id: str) -> UserDomain | None: ...
+    def get_by_id(
+        self,
+        user_id: str,
+    ) -> UserDomain | None:
+        """
+        Here user_id is a primary column so i will use the .get()
+        """
+        obj = self._session.get(
+            UserModel,
+            user_id,
+        )
 
-    def get_by_email(self, email: str) -> UserDomain | None: ...
+        if obj is None:
+            return None
 
-    def exists_by_email(self, email: str) -> bool: ...
+        return to_domain(obj)
 
-    def add(self, user: UserDomain) -> UserDomain: ...
+    def get_by_email(self, email: str) -> UserDomain | None:
+        """
+        Email address is unique so i will use
 
-    def update(self, user: UserDomain) -> UserDomain: ...
+        as i know this is unique so i use .first() to get first row or none
+        """
+        statement = select(UserModel).where(
+            UserModel.email == email,
+        )
+        results = self._session.exec(statement)
+        obj = results.first()
+
+        if obj is None:
+            return None
+
+        return to_domain(obj)
+
+    def exists_by_email(self, email: str) -> bool:
+        r = self.get_by_email(email) is None
+        return not r
+
+    def add(self, user: UserDomain) -> UserDomain:
+        """
+        Adding the user to the database but the catche is this is coming
+        from the userDomain obj i need to convert this
+        """
+        model_obj = to_model(user)
+        self._session.add(model_obj)
+        self._session.commit()
+        self._session.refresh(model_obj)
+        entity_obj = to_domain(model_obj)
+
+        return entity_obj
+

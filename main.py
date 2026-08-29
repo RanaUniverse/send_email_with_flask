@@ -28,9 +28,22 @@ from app.shared.extensions import login_manager, csrf
 
 from app.shared.otp.runtime_validation import validate_all_otp_config
 
+# i need to execute this so that the user_loader will be register
+from app.features.identity.presentation import authentication
+
+
+from flask_di import (  # type: ignore
+    DIFlask,
+)
+
 
 def create_app() -> Flask:
-    app = Flask(
+
+    # app = Flask(
+    #     import_name=__name__,
+    # )
+
+    app = DIFlask(
         import_name=__name__,
     )
 
@@ -40,7 +53,6 @@ def create_app() -> Flask:
     csrf.init_app(  # type: ignore
         app=app,
     )
-
     app.secret_key = settings.app.secret_key.get_secret_value()
 
     app.register_blueprint(blueprint=auth_bp)

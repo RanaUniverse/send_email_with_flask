@@ -1,5 +1,6 @@
 """
-app/features/identity/services/otp.py
+app/features/identity/application/registration/otp.py
+
 
 Identity specefic OTP operations.
 
@@ -49,7 +50,7 @@ def send_otp_to_email(
     )
 
     mail_send = s.execute(
-        identifier=email_id  ,
+        identifier=email_id,
         purpose=purpose,
     )
 

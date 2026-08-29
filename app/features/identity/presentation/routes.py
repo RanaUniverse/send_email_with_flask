@@ -8,7 +8,6 @@ from flask import (
     Blueprint,
     flash,
     render_template,
-    # request,
     redirect,
     url_for,
     session,
@@ -24,8 +23,7 @@ from flask_login import (  # type: ignore
 
 from ..domain.exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
-from ..services.services import check_authentication
-from ..dependencies import registration_service_obj
+from ..dependencies import RegistrationServiceDep, LoginServiceDep
 from .message import registration_to_flash, FlashCategory
 
 from ..domain.enums import AfterRegistrationNextStep
@@ -48,7 +46,9 @@ auth_bp = Blueprint(
     "/login",
     methods=["GET", "POST"],
 )
-def login():
+def login(
+    login_service: LoginServiceDep,
+):
 
     form = LoginForm()
 
@@ -56,7 +56,7 @@ def login():
         email = form.email.data or ""
         password = form.password.data or ""
 
-        user_obj = check_authentication(
+        user_obj = login_service.check_authentication(
             email=email,
             password=password,
         )
@@ -102,7 +102,9 @@ def logout():
     rule="/login-with-password",
     methods=["GET", "POST"],
 )
-def login_with_password():
+def login_with_password(
+    login_service: LoginServiceDep,
+):
     """
     This will take the email id and ask for the password to enter
 
@@ -128,7 +130,7 @@ def login_with_password():
 
     if form.validate_on_submit():  # type: ignore
         password = form.password.data or ""
-        user_obj = check_authentication(
+        user_obj = login_service.check_authentication(
             email=email,
             password=password,
         )
@@ -166,7 +168,9 @@ def login_with_password():
     rule="/register",
     methods=["GET", "POST"],
 )
-def register():
+def register(
+    register_service: RegistrationServiceDep,
+):
     """
     this page is for showing registerariotn page to user
     and if registion data submitted then this will shows
@@ -177,7 +181,7 @@ def register():
     if form.validate_on_submit():  # type: ignore
 
         try:
-            register = registration_service_obj.start_registration(
+            register = register_service.start_registration(
                 email=form.email.data or "",
             )
 
@@ -248,7 +252,9 @@ def register():
     "/verify-otp",
     methods=["GET", "POST"],
 )
-def verify_otp():
+def verify_otp(
+    register_service: RegistrationServiceDep,
+):
 
     email = session.get("pending_email")
 
@@ -275,7 +281,7 @@ def verify_otp():
         otp = form.otp.data or ""
 
         try:
-            verify = registration_service_obj.verify_registration_otp(
+            verify = register_service.verify_registration_otp(
                 email=email,
                 submitted_otp=otp,
             )
@@ -291,9 +297,9 @@ def verify_otp():
                 form=form,
             )
 
-        if verify.success():
+        if verify.success:
 
-            new_user = registration_service_obj.add_user_to_db(
+            new_user = register_service.add_user_to_db(
                 email=email,
             )
 

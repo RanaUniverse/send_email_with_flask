@@ -4,6 +4,9 @@ app/features/identity/presentation/authentication.py
 Here i will write my user class for flask_login related thigns
 """
 
+from typing import cast
+
+
 from flask import current_app
 from flask_di import Depends  # type: ignore
 
@@ -71,12 +74,9 @@ class FlaskLoginUser(UserMixin):
 #     return FlaskLoginUser(obj_entity)
 
 
-# TODO
-# i need to make sure to resolve the di fun of user_repository below
 @login_manager.user_loader  # type: ignore
 def load_user(
     user_id: str,
-    # user_repository: UserRepositoryDep,
 ) -> FlaskLoginUser | None:
     """
     https://flask-login.readthedocs.io/en/latest/#how-it-works
@@ -86,11 +86,15 @@ def load_user(
     from the user_obj i will get differnt data to use.
     """
 
-    user_repository: UserRepository = current_app._resolve_dependency(  # type: ignore
-        Depends(user_repository_provider)
+    # later i will upgrde this library and solve this #TODO
+    user_repository_old = current_app._resolve_dependency(  # type: ignore
+        Depends(
+            user_repository_provider,
+        )
     )
+    user_repository = cast(UserRepository, user_repository_old)
 
-    obj_domain = user_repository.get_by_id(  # type: ignore
+    obj_domain = user_repository.get_by_id(
         user_id,
     )
 
@@ -98,7 +102,7 @@ def load_user(
         return None
 
     obj = FlaskLoginUser(
-        obj_domain,  # type: ignore
+        obj_domain,
     )
     return obj
 

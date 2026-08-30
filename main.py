@@ -29,7 +29,12 @@ from app.shared.extensions import login_manager, csrf
 from app.shared.otp.runtime_validation import validate_all_otp_config
 
 # i need to execute this so that the user_loader will be register
-from app.features.identity.presentation import authentication
+from app.features.identity.presentation import authentication  # type: ignore
+from app.database.initialization import create_db_and_tables
+
+create_db_and_tables()
+
+# later i need to keep a way to know if this upper things are ok to use or not?
 
 
 from flask_di import (  # type: ignore

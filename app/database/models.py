@@ -9,10 +9,7 @@ before create_all() is called.
 """
 
 # Later:
-# from app.features.identity.infrastructure.persistence.sqlmodel.models import (
-#     UserModel,
-# )
-
+from app.features.identity.infrastructure.sqlmodel.models import UserModel
 # from app.features.orders.infrastructure.persistence.sqlmodel.models import (
 #     OrderModel,
 # )
@@ -21,3 +18,4 @@ before create_all() is called.
 # from app.features.products.infrastructure.persistence.sqlmodel.models import (
 #     ProductModel,
 # )
+

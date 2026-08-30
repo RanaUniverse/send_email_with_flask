@@ -8,6 +8,8 @@ for the sqlmodel i will write code here
 
 """
 
+from typing import cast
+
 # i am using the below class as a protocol to make this below
 from ...domain.repositories.user_repository import UserRepository
 
@@ -35,7 +37,15 @@ class SQLModelUserRepository(UserRepository):
         self,
         session: Session,
     ) -> None:
-        self._session = session
+        # self._session = session
+
+        # i have changed upper to below as this library not currently support
+        # the yield to return the session so i use below thigns
+        self._session_generator = session
+        self._session_old = next(self._session_generator)  # type: ignore
+        self._session = cast(Session, self._session_old)  # type: ignore
+        print("Printing session below from yield")
+        print(self._session)
 
     def get_by_id(
         self,
@@ -87,4 +97,3 @@ class SQLModelUserRepository(UserRepository):
         entity_obj = to_domain(model_obj)
 
         return entity_obj
-

@@ -27,7 +27,7 @@ from ..dependencies import RegistrationServiceDep, LoginServiceDep
 from .message import registration_to_flash, FlashCategory
 
 from ..domain.enums import AfterRegistrationNextStep
-
+from ..presentation.authentication import FlaskLoginUser
 
 from app.shared.otp.policy import get_otp_policy_obj
 from app.shared.otp.enums import OTPPurpose
@@ -303,7 +303,12 @@ def verify_otp(
                 email=email,
             )
 
-            login_user(user=new_user)
+            # i need to make sure this is using the flask-login class
+            login_user(
+                user=FlaskLoginUser(
+                    new_user,
+                )
+            )
 
             flash(
                 "OTP verified successfully.",

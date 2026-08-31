@@ -36,46 +36,48 @@ def handle_registration_result(
         category=information.category,
     )
 
-    if result.next_step == AfterRegistrationNextStep.VERIFY_OTP:
+    match result.next_step:
 
-        set_identity_key_in_session(
-            key=IdentitySessionKey.REGISTER_PENDING,
-            email_value=email,
-        )
+        case AfterRegistrationNextStep.VERIFY_OTP:
 
-        return redirect(
-            url_for(
-                "auth_bp.verify_otp",
+            set_identity_key_in_session(
+                key=IdentitySessionKey.REGISTER_PENDING,
+                email_value=email,
             )
-        )
 
-    if result.next_step == AfterRegistrationNextStep.ENTER_PASSWORD:
-        set_identity_key_in_session(
-            key=IdentitySessionKey.LOGIN_PENDING,
-            email_value=email,
-        )
-        return redirect(
-            url_for(
-                "auth_bp.login_with_password",
+            return redirect(
+                url_for(
+                    "auth_bp.verify_otp",
+                )
             )
-        )
 
-    if result.next_step == AfterRegistrationNextStep.SHOW_ERROR:
-
-        return redirect(
-            url_for(
-                "auth_bp.register",
+        case AfterRegistrationNextStep.ENTER_PASSWORD:
+            set_identity_key_in_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+                email_value=email,
             )
-        )
-
-    else:
-        # i will do some check here later
-        flash(
-            "Somethign went wrong pls report to admin",
-            "warning",
-        )
-        return redirect(
-            url_for(
-                "auth_bp.register",
+            return redirect(
+                url_for(
+                    "auth_bp.login_with_password",
+                )
             )
-        )
+
+        case AfterRegistrationNextStep.SHOW_ERROR:
+
+            return redirect(
+                url_for(
+                    "auth_bp.register",
+                )
+            )
+
+        case _:
+            # i will do some check here later
+            flash(
+                "Somethign went wrong pls report to admin",
+                "warning",
+            )
+            return redirect(
+                url_for(
+                    "auth_bp.register",
+                )
+            )

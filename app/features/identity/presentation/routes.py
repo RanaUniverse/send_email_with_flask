@@ -213,54 +213,6 @@ def register(
                 form=form,
             )
 
-        # information = registration_to_flash(
-        #     result=result,
-        # )
-
-        # flash(
-        #     message=information.message,
-        #     category=information.category,
-        # )
-
-        # if result.next_step == AfterRegistrationNextStep.VERIFY_OTP:
-
-        #     set_identity_key_in_session(
-        #         key=IdentitySessionKey.REGISTER_PENDING,
-        #         email_value=email,
-        #     )
-
-        #     return redirect(
-        #         url_for(
-        #             "auth_bp.verify_otp",
-        #         )
-        #     )
-
-        # if result.next_step == AfterRegistrationNextStep.ENTER_PASSWORD:
-        #     set_identity_key_in_session(
-        #         key=IdentitySessionKey.LOGIN_PENDING,
-        #         email_value=email,
-        #     )
-        #     return redirect(
-        #         url_for(
-        #             "auth_bp.login_with_password",
-        #         )
-        #     )
-
-        # if result.next_step == AfterRegistrationNextStep.SHOW_ERROR:
-
-        #     return redirect(
-        #         url_for(
-        #             "auth_bp.register",
-        #         )
-        #     )
-
-        # else:
-        #     # i will do some check here later
-        #     flash(
-        #         "Somethign went wrong pls report to admin",
-        #         "warning",
-        #     )
-
         return handle_registration_result(
             result=result,
             email=email,
@@ -404,10 +356,13 @@ def change_registration_email():
     """
     When this request will come i need to check if the user
     """
-    pop_key_from_session(key=IdentitySessionKey.REGISTER_PENDING)
+    pop_key_from_session(
+        key=IdentitySessionKey.REGISTER_PENDING,
+    )
 
     flash(
-        message="Please enter your new email address and continue the registration.",
+        message="📧 No problem! Please enter your new email address "
+        "to continue your registration.",
         category=FlashCategory.INFO,
     )
 
@@ -415,14 +370,13 @@ def change_registration_email():
 
 
 @auth_bp.route(rule="/resend-registration-otp", methods=["POST"])
-def resend_registration_otp(
-    register_service: RegistrationServiceDep,
-):
+def resend_registration_otp():
     """
     Here i need to decide if the otp sending will done now or not
     then only i will send the otp.
     """
-    # TODO: implement OTP resend logic
+    # TODO: implement OTP resend logic where i am sending same
+    # or differnet otp based on implimentations
 
     flash(
         message="📨 A new OTP will be sent here.",

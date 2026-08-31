@@ -18,7 +18,7 @@ from typing import Annotated
 
 from sqlmodel import Session
 
-from flask_di import Depends  # type: ignore
+from flask_di import Depends
 
 
 from app.database.engine import engine

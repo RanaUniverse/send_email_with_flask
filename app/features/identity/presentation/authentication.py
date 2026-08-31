@@ -7,8 +7,10 @@ Here i will write my user class for flask_login related thigns
 from typing import cast
 
 
-from flask import current_app
-from flask_di import Depends  # type: ignore
+from flask_di import (
+    Depends,
+    current_app,
+)
 
 from flask_login import (  # type: ignore
     UserMixin,
@@ -86,8 +88,8 @@ def load_user(
     from the user_obj i will get differnt data to use.
     """
 
-    # later i will upgrde this library and solve this #TODO
-    user_repository_old = current_app._resolve_dependency(  # type: ignore
+    # i need to solve the problem of .resolve() -> will return proper type
+    user_repository_old = current_app.resolve(
         Depends(
             user_repository_provider,
         )

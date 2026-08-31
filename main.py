@@ -14,7 +14,9 @@ sys.dont_write_bytecode = True
 # This upper is for safety and just to keep in the repo for testing purpose only
 
 
-from flask import Flask
+from flask_di import (
+    DIFlask,
+)
 
 
 from app.config import settings
@@ -37,17 +39,9 @@ create_db_and_tables()
 # later i need to keep a way to know if this upper things are ok to use or not?
 
 
-from flask_di import (  # type: ignore
-    DIFlask,
-)
+def create_app() -> DIFlask:
 
-
-def create_app() -> Flask:
-
-    # app = Flask(
-    #     import_name=__name__,
-    # )
-
+    # As i am using di-flask so i am not using the Flask instance
     app = DIFlask(
         import_name=__name__,
     )
@@ -65,6 +59,7 @@ def create_app() -> Flask:
     # app.register_blueprint(blueprint=mail_bp)
 
     validate_all_otp_config()
+
     return app
 
 

@@ -25,7 +25,7 @@ wiring for the identity feature.
 from typing import Annotated
 
 
-from flask_di import Depends  # type: ignore
+from flask_di import Depends
 
 
 from app.config import settings

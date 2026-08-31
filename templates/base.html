@@ -27,6 +27,12 @@
 
     {% include 'partials/_footer.html' %}
     {% include 'partials/_assets_js.html' %}
+
+    {% block custom_js %}
+    I will inject different js file relative links here
+    i shuold to think about CSP there.
+    {% endblock %}
+
 </body>
 
 </html>

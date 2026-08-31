@@ -1,3 +1,10 @@
+{#
+app/features/identity/presentation/templates/auth/verify_otp.html
+
+verify otp page to shows here
+#}
+
+
 {% extends "base.html" %}
 
 {% block title %}Register OTP Verification{% endblock %}
@@ -73,20 +80,46 @@
 
                         </div>
 
+
                     </form>
+                    <div class="text-center mt-3">
+                        <form method="POST" action="{{ url_for('auth_bp.change_registration_email') }}">
+                            {{ form.hidden_tag() }}
+
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                Use a different email
+                            </button>
+                        </form>
+                    </div>
+
+
+
+
 
 
                     <div class="text-center mt-4">
-
                         <p class="text-muted small mb-2">
                             Didn't receive the code?
                         </p>
 
-                        <button type="button" class="btn btn-link btn-sm text-decoration-none" disabled>
-                            Resend OTP
-                        </button>
+                        <form method="POST" action="{{ url_for('auth_bp.resend_registration_otp') }}">
+                            {{ form.hidden_tag() }}
+
+                            <button type="submit" id="resend-otp-btn" class="btn btn-link btn-sm text-decoration-none"
+                                disabled>
+                                {# i can pass the value as int my js will convert it automatically #}
+                                Resend OTP in <span id="otp-countdown">31</span>s
+                            </button>
+                        </form>
 
                     </div>
+
+
+
+
+
+
+
 
 
                     <hr class="my-4">
@@ -111,4 +144,10 @@
     </div>
 </div>
 
+{% endblock %}
+
+
+{% block custom_js %}
+<script src="{{url_for('static',filename='js/identity/verify_otp.js')}}">
+</script>
 {% endblock %}

@@ -46,7 +46,8 @@ auth_bp = Blueprint(
     name="auth_bp",
     import_name=__name__,
     template_folder="templates",
-    # static_folder="static",
+    static_folder="static",
+    static_url_path="/identity_static",
 )
 
 

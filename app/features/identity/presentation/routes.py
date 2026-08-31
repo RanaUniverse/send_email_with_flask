@@ -2,6 +2,11 @@
 app/features/identity/routes.py
 
 Here i will keep login related things
+
+/register ->
+/verify_otp ->
+/login ->
+
 """
 
 from flask import (
@@ -19,14 +24,15 @@ from flask_login import (  # type: ignore
     logout_user,
 )
 
-
 from ..domain.exceptions import InvalidEmailError
 from .forms import LoginForm, RegisterForm, OTPForm
 from ..dependencies import RegistrationServiceDep, LoginServiceDep
-from .message import registration_to_flash, FlashCategory
+from .message import FlashCategory
 
-from ..domain.enums import AfterRegistrationNextStep
 from ..presentation.authentication import FlaskLoginUser
+
+from .registration_response import handle_registration_result
+
 
 from app.shared.otp.policy import get_otp_policy_obj
 from app.shared.otp.enums import OTPPurpose
@@ -34,7 +40,6 @@ from app.shared.otp.enums import OTPPurpose
 
 from app.shared.session.enums import IdentitySessionKey
 from app.shared.session.service import (
-    set_identity_key as set_identity_key_in_session,
     pop_key as pop_key_from_session,
     get_identity_email as get_identity_email_from_session,
 )
@@ -192,9 +197,10 @@ def register(
 
     if form.validate_on_submit():  # type: ignore
 
+        email = form.email.data or ""
         try:
-            register = register_service.start_registration(
-                email=form.email.data or "",
+            result = register_service.start_registration(
+                email=email,
             )
 
         except InvalidEmailError as e:
@@ -207,63 +213,75 @@ def register(
                 form=form,
             )
 
-        # TODO later i will add a step if mail server down or somethign so that i can
-        # shows to use another way like this based on this
+        # information = registration_to_flash(
+        #     result=result,
+        # )
 
-        information = registration_to_flash(
-            result=register,
+        # flash(
+        #     message=information.message,
+        #     category=information.category,
+        # )
+
+        # if result.next_step == AfterRegistrationNextStep.VERIFY_OTP:
+
+        #     set_identity_key_in_session(
+        #         key=IdentitySessionKey.REGISTER_PENDING,
+        #         email_value=email,
+        #     )
+
+        #     return redirect(
+        #         url_for(
+        #             "auth_bp.verify_otp",
+        #         )
+        #     )
+
+        # if result.next_step == AfterRegistrationNextStep.ENTER_PASSWORD:
+        #     set_identity_key_in_session(
+        #         key=IdentitySessionKey.LOGIN_PENDING,
+        #         email_value=email,
+        #     )
+        #     return redirect(
+        #         url_for(
+        #             "auth_bp.login_with_password",
+        #         )
+        #     )
+
+        # if result.next_step == AfterRegistrationNextStep.SHOW_ERROR:
+
+        #     return redirect(
+        #         url_for(
+        #             "auth_bp.register",
+        #         )
+        #     )
+
+        # else:
+        #     # i will do some check here later
+        #     flash(
+        #         "Somethign went wrong pls report to admin",
+        #         "warning",
+        #     )
+
+        return handle_registration_result(
+            result=result,
+            email=email,
         )
-
-        flash(
-            message=information.message,
-            category=information.category,
-        )
-
-        if register.next_step == AfterRegistrationNextStep.VERIFY_OTP:
-
-            set_identity_key_in_session(
-                key=IdentitySessionKey.REGISTER_PENDING,
-                email_value=form.email.data or "",
-            )
-
-            return redirect(
-                url_for(
-                    "auth_bp.verify_otp",
-                )
-            )
-
-        if register.next_step == AfterRegistrationNextStep.ENTER_PASSWORD:
-            set_identity_key_in_session(
-                key=IdentitySessionKey.LOGIN_PENDING,
-            )
-            return redirect(
-                url_for(
-                    "auth_bp.login_with_password",
-                )
-            )
-
-        if register.next_step == AfterRegistrationNextStep.SHOW_ERROR:
-
-            return redirect(
-                url_for(
-                    "auth_bp.register",
-                )
-            )
 
     else:
+        # this part will also work for get req so i keep this for some previous
+        # error to shows here
         for field, errors in form.errors.items():
             for error in errors:
                 flash(
                     message=f"{field.upper()}: {error}",
                     category="danger",
                 )
-    # Now here get request is working
     pending_email = get_identity_email_from_session(
         IdentitySessionKey.REGISTER_PENDING,
     )
 
     if pending_email is not None:
         # later i will add redis checking if possible #TODO
+        print("running now")
         flash(
             f"📧 Registration pending for {pending_email}. "
             "🔐 Verify the OTP to continue, or 🔄 use a different email.",

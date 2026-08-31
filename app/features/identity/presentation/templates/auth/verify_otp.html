@@ -98,9 +98,17 @@ verify otp page to shows here
 
 
                     <div class="text-center mt-4">
+
                         <p class="text-muted small mb-2">
                             Didn't receive the code?
+                            <i class="bi bi-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="You can request a new OTP after the countdown finishes." style="cursor: help;">
+                            </i>
                         </p>
+
+
+
+
 
                         <form method="POST" action="{{ url_for('auth_bp.resend_registration_otp') }}">
                             {{ form.hidden_tag() }}

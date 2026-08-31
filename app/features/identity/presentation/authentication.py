@@ -88,8 +88,8 @@ def load_user(
     from the user_obj i will get differnt data to use.
     """
 
-    # i need to solve the problem of .resolve() -> will return proper type
-    user_repository_old = current_app.resolve(
+    # later i will upgrde this library and solve this #TODO
+    user_repository_old = current_app._resolve_dependency(  # type: ignore
         Depends(
             user_repository_provider,
         )

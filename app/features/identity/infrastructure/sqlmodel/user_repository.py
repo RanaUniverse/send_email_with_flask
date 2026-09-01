@@ -86,7 +86,10 @@ class SQLModelUserRepository(UserRepository):
         r = self.get_by_email(email) is None
         return not r
 
-    def add(self, user: UserDomain) -> UserDomain:
+    def add(
+        self,
+        user: UserDomain,
+    ) -> UserDomain:
         """
         Adding the user to the database but the catche is this is coming
         from the userDomain obj i need to convert this

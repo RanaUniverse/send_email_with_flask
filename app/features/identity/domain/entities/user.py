@@ -27,9 +27,11 @@ class UserDomain:
     This is my application user this only knows about my business need
     """
 
-    id_: str
+    # the value is None when generating but when coming from db this
+    # value is present so i keep str|NOne
     email: str
     hashed_password: str
+    id_: str | None = None
 
     is_active: bool = True
     is_verified: bool = False

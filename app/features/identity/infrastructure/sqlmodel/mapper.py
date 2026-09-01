@@ -28,10 +28,24 @@ def to_domain(
     return obj
 
 
-def to_model(user_obj: UserDomain) -> UserModel:
+def to_model(
+    user_obj: UserDomain,
+) -> UserModel:
     """
     get the entity user obj and make this to be in sqlmodle table
     data to use
+    The userdomain which comes to me there id_ = None as i think for registration
     """
-    obj = UserModel.model_validate(user_obj)
-    return obj
+    if user_obj.id_ is None:
+        return UserModel(
+            email=user_obj.email,
+            hashed_password=user_obj.hashed_password,
+            is_active=user_obj.is_active,
+            is_verified=user_obj.is_verified,
+        )
+
+    else:
+        obj = UserModel.model_validate(
+            user_obj,
+        )
+        return obj

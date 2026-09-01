@@ -192,20 +192,16 @@ class RegistrationService:
         email: EmailStr,
     ) -> UserDomain:
 
-        random_part = secrets.token_hex(3)
-        fake_username = f"user_{random_part}"
-
-        # fake_phone = "9" + "".join(secrets.choice(string.digits) for _ in range(9))
-
         fake_password = "".join(
             secrets.choice(string.ascii_letters + string.digits) for _ in range(16)
         )
 
         user_obj = UserDomain(
-            id_=str(secrets.token_hex(4)),
-            email=f"{fake_username}xyz@gmail.com",
+            email=email,
             hashed_password=fake_password,
         )
+        print("in registerion servicwe")
+        print(user_obj.id_)
         new_user = self._user_repository.add(user_obj)
 
         return new_user

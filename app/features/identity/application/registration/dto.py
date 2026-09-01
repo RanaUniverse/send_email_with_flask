@@ -4,6 +4,9 @@ app/features/identity/models.py
 This will have the models or data to keep for this related thigns
 """
 
+from dataclasses import dataclass
+
+
 from pydantic import BaseModel
 
 
@@ -15,6 +18,20 @@ from ...domain.enums import (
 )
 
 
+@dataclass(frozen=True)
+class RegistrationIdentity:
+    """
+    At Least email or phone should be provided
+    """
+
+    email: str | None = None
+    phone: str | None = None
+
+    def __post_init__(self):
+        if self.email is None and self.phone is None:
+            raise ValueError("At least one identity must be provided.")
+
+
 class RegistrationResult(BaseModel):
     """
     This is for Frontend, this result will use by routes.py
@@ -23,6 +40,7 @@ class RegistrationResult(BaseModel):
 
     status: RegistrationStatus
     next_step: AfterRegistrationNextStep
+    identity: RegistrationIdentity | None = None
 
     @property
     def success(

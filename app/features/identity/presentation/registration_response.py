@@ -20,7 +20,6 @@ from .message import registration_to_flash
 
 def handle_registration_result(
     result: RegistrationResult,
-    email: str,
 ):
     """
     From the routes function i will decide waht to do here based
@@ -35,6 +34,11 @@ def handle_registration_result(
         message=information.message,
         category=information.category,
     )
+    # later i will think how i can add phone, email or somethig username
+    if result.identity:
+        email = result.identity.email
+    else:
+        email = ""
 
     match result.next_step:
 

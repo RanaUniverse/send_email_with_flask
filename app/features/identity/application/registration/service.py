@@ -28,6 +28,7 @@ from ...domain.enums import (
 from .dto import (
     RegistrationResult,
     RegistrationViaOTPResult,
+    RegistrationIdentity,
 )
 
 
@@ -74,11 +75,13 @@ class RegistrationService:
             validated_email_id = ValidatedEmail(
                 email_id=email,
             ).value
-
         except InvalidEmailError:
             # my routes can handle this error there and say user
-            # i need to sure later will this ok to routs handle this or not
             raise
+        #  i am passing this object so that my routes can decide to do with this
+        identity_obj = RegistrationIdentity(
+            email=validated_email_id,
+        )
 
         existing_user = self._user_repository.exists_by_email(
             email=validated_email_id,
@@ -88,15 +91,9 @@ class RegistrationService:
             x = RegistrationResult(
                 status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
                 next_step=AfterRegistrationNextStep.ENTER_PASSWORD,
+                identity=identity_obj,
             )
             return x
-
-        # database checking function will run here
-
-        # Here i need to check if the email is already register or not
-        # and based on this i will send him register email else i will
-        # send him the page to login with password or with otp as my
-        # business logic will say to do this
 
         # i am calling a fun which call the backend's email send
         otp_send = send_otp_to_email(
@@ -111,6 +108,7 @@ class RegistrationService:
             x = RegistrationResult(
                 status=RegistrationStatus.OTP_SENT,
                 next_step=AfterRegistrationNextStep.VERIFY_OTP,
+                identity=identity_obj,
             )
             return x
 
@@ -118,18 +116,21 @@ class RegistrationService:
             return RegistrationResult(
                 status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
+                identity=identity_obj,
             )
 
         elif otp_send.status == OTPSendStatus.EMAIL_BLOCKED:
             return RegistrationResult(
                 status=RegistrationStatus.EMAIL_BLOCKED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
+                identity=identity_obj,
             )
 
         elif otp_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
             return RegistrationResult(
                 status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
+                identity=identity_obj,
             )
 
         elif otp_send.status in (
@@ -139,12 +140,14 @@ class RegistrationService:
             return RegistrationResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
+                identity=identity_obj,
             )
 
         else:
             x = RegistrationResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
+                identity=identity_obj,
             )
 
             return x

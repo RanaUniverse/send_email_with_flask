@@ -212,32 +212,28 @@ def register(
                 "auth/register.html",
                 form=form,
             )
-
+        # This below will decide what to shows to user now
         return handle_registration_result(
             result=result,
-            email=email,
         )
 
-    else:
-        # this part will also work for get req so i keep this for some previous
-        # error to shows here
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(
-                    message=f"{field.upper()}: {error}",
-                    category="danger",
-                )
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(
+                message=f"{field.upper()}: {error}",
+                category="danger",
+            )
+
     pending_email = get_identity_email_from_session(
         IdentitySessionKey.REGISTER_PENDING,
     )
 
     if pending_email is not None:
         # later i will add redis checking if possible #TODO
-        print("running now")
         flash(
             f"📧 Registration pending for {pending_email}. "
             "🔐 Verify the OTP to continue, or 🔄 use a different email.",
-            "warning",
+            FlashCategory.WARNING,
         )
 
         return redirect(url_for("auth_bp.verify_otp"))

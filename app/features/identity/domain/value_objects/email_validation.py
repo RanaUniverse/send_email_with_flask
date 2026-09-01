@@ -61,7 +61,7 @@ class ValidatedEmail:
             raise InvalidEmailError(
                 "Please Use Your Proper Email ID",
             )
-        self._value = model.value
+        self._value = str(model.value).lower()
 
     @property
     def value(self) -> EmailStr:

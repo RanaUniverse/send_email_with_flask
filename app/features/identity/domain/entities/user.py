@@ -30,7 +30,7 @@ class UserDomain:
     # the value is None when generating but when coming from db this
     # value is present so i keep str|NOne
     email: str
-    hashed_password: str
+    hashed_password: str | None = None
     id_: str | None = None
 
     is_active: bool = True

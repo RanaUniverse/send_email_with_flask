@@ -62,7 +62,11 @@ class UserModel(
         primary_key=True,
     )
 
-    hashed_password: str = Field()
+    hashed_password: str | None = Field(
+        default=None,
+        description="From the password i will make the hashed_password"
+        " or not deciding if user has password or not",
+    )
 
 
 class UserPublic(UserBase):
@@ -81,20 +85,3 @@ class UserUpdate(SQLModel):
     is_active: bool | None = None
     is_verified: bool | None = None
     password: str | None = None
-
-
-# For now i delete this as i think to use the UserModel class to verify
-# and convert to and from that
-# class UserOutForDomainEntity(UserBase):
-#     """
-#     I make this as a extra security so that any extra
-#     information dont need to leak to the other service.
-#     For now my login entity will take this values
-#     """
-
-#     id_: str
-#     email: str
-#     hashed_password: str
-
-#     is_active: bool = True
-#     is_verified: bool = False

@@ -4,10 +4,6 @@ app/features/identity/services/registration.py
 Registration related code fun and so on will be present here
 """
 
-import string
-import secrets
-
-
 from pydantic import EmailStr
 
 
@@ -57,15 +53,12 @@ class RegistrationService:
     def _add_user_to_db(
         self,
         email: EmailStr,
+        hashed_password: str | None = None,
     ) -> UserDomain:
-
-        fake_password = "".join(
-            secrets.choice(string.ascii_letters + string.digits) for _ in range(16)
-        )
 
         user_obj = UserDomain(
             email=email,
-            hashed_password=fake_password,
+            hashed_password=hashed_password,
         )
         new_user = self._user_repository.add(user_obj)
 

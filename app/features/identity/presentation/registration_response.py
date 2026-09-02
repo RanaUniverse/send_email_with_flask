@@ -10,12 +10,23 @@ from flask import (
     url_for,
     flash,
 )
+
+
 from ..application.registration.dto import RegistrationResult
 from ..domain.enums import AfterRegistrationNextStep
 
 from app.shared.session.enums import IdentitySessionKey
 from app.shared.session.service import set_identity_key as set_identity_key_in_session
 from .message import registration_to_flash
+
+
+def _get_required_email(
+    result: RegistrationResult,
+) -> str | None:
+    if result.identity is None:
+        return None
+
+    return result.identity.email
 
 
 def handle_registration_result(
@@ -35,11 +46,21 @@ def handle_registration_result(
         category=information.category,
     )
     # later i will think how i can add phone, email or somethig username
-    if result.identity:
-        email = result.identity.email
-    else:
-        email = ""
 
+    email = _get_required_email(
+        result=result,
+    )
+
+    # maybe later when i will phone, or somethigns different i
+    # will need to change the logic in session storage and also this
+    if email is None:
+        flash(
+            "Something went wrong. Please try again with another details.",
+            "danger",
+        )
+        return redirect(url_for("auth_bp.register"))
+
+    # the emal = str|None, so how i can tackle the None or no need
     match result.next_step:
 
         case AfterRegistrationNextStep.VERIFY_OTP:

@@ -104,8 +104,13 @@ def get_identity_email(
 ) -> str | None:
     """
     Get the email value from an identity session entry.
+
+    As time of saving the email i validated that email,
+    so here i dont need to validate the email from this
     """
-    identity = get_identity(key)
+    identity = get_identity(
+        key,
+    )
 
     if identity is None:
         return None

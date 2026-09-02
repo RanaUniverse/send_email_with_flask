@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from pydantic import BaseModel
 
+from ...domain.entities.user import UserDomain
 
 from ...domain.enums import (
     RegistrationStatus,
@@ -61,6 +62,7 @@ class RegistrationViaOTPResult(BaseModel):
     """
 
     status: RegistrationOTPStatus
+    user: UserDomain | None = None
     next_step: RegistrationOTPStatusNextStep | None = None
 
     @property

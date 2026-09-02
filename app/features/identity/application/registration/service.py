@@ -54,6 +54,23 @@ class RegistrationService:
 
         self._user_repository = user_repository
 
+    def _add_user_to_db(
+        self,
+        email: EmailStr,
+    ) -> UserDomain:
+
+        fake_password = "".join(
+            secrets.choice(string.ascii_letters + string.digits) for _ in range(16)
+        )
+
+        user_obj = UserDomain(
+            email=email,
+            hashed_password=fake_password,
+        )
+        new_user = self._user_repository.add(user_obj)
+
+        return new_user
+
     def start_registration(
         self,
         email: str,
@@ -152,25 +169,30 @@ class RegistrationService:
 
             return x
 
-    def verify_registration_otp(
+    def complete_registration_with_otp(
         self,
         email: str,
         submitted_otp: str,
-    ) -> RegistrationViaOTPResult:
+    ):
         """
-        This will verify the otp given by user at verify otp case
-        i keep it here because this is responsible for otp checking for registration
+        For success it will insert data into the db
+        and then if wrong any then it will raise a error
+
+        Raise:
+            InvalidEmailError
+
         """
-        # as i cannot depends on the email id data i got from the sesion
-        # i will again check the validaiton of the email
+        # even though i think this checkin is not need here, as the email in session should
+        # has been validated beforehand
         try:
             validated_email_id = ValidatedEmail(
                 email_id=email,
             ).value
-
         except InvalidEmailError:
             raise
 
+        # here i think to add some logic to check before
+        # if user has attempt exceed like this or not
         verify = verify_otp_against_email(
             email=validated_email_id,
             purpose=OTPPurpose.REGISTER,
@@ -178,30 +200,14 @@ class RegistrationService:
         )
 
         if verify.success:
-
+            new_user = self._add_user_to_db(
+                email=validated_email_id,
+            )
             return RegistrationViaOTPResult(
                 status=RegistrationOTPStatus.VERIFIED,
+                user=new_user,
             )
 
         return RegistrationViaOTPResult(
-            status=RegistrationOTPStatus.INVALID_OTP,
+            status=RegistrationOTPStatus.NOT_VERIFIED,
         )
-
-    def add_user_to_db(
-        self,
-        email: EmailStr,
-    ) -> UserDomain:
-
-        fake_password = "".join(
-            secrets.choice(string.ascii_letters + string.digits) for _ in range(16)
-        )
-
-        user_obj = UserDomain(
-            email=email,
-            hashed_password=fake_password,
-        )
-        print("in registerion servicwe")
-        print(user_obj.id_)
-        new_user = self._user_repository.add(user_obj)
-
-        return new_user

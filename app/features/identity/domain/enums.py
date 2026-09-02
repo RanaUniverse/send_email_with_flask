@@ -26,11 +26,16 @@ class AfterRegistrationNextStep(StrEnum):
 
 
 class RegistrationOTPStatus(StrEnum):
+    """
+    Currently i have only implimented the verified and invalid_otp
+    """
 
     VERIFIED = "verified"
     INVALID_OTP = "invalid_otp"
     OTP_NOT_FOUND = "otp_not_found"
     ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"
+    NOT_VERIFIED = "not_verified"
+    # This last one is a generic one i need later not try to use why not
 
 
 class RegistrationOTPStatusNextStep(StrEnum):

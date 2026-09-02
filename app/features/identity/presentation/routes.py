@@ -212,6 +212,7 @@ def register(
                 "auth/register.html",
                 form=form,
             )
+
         # This below will decide what to shows to user now
         return handle_registration_result(
             result=result,
@@ -221,13 +222,15 @@ def register(
         for error in errors:
             flash(
                 message=f"{field.upper()}: {error}",
-                category="danger",
+                category=FlashCategory.WARNING,
             )
 
     pending_email = get_identity_email_from_session(
         IdentitySessionKey.REGISTER_PENDING,
     )
 
+    # This below condition is for showing the user otp page if he already
+    # ask for the registration some time ago and come to /register again
     if pending_email is not None:
         # later i will add redis checking if possible #TODO
         flash(
@@ -262,7 +265,7 @@ def verify_otp(
 
     if email is None:
         flash(
-            message="First Register Your Account with Email ID then verify your accoutn",
+            message="First Register Your Account with Email ID then verify your account",
             category=FlashCategory.WARNING,
         )
         return redirect(
@@ -271,11 +274,12 @@ def verify_otp(
             )
         )
 
-    obj = get_otp_policy_obj(
+    policy = get_otp_policy_obj(
         purpose=OTPPurpose.REGISTER,
     )
+
     form = OTPForm(
-        otp_length=obj.length,
+        otp_length=policy.length,
     )
 
     if form.validate_on_submit():  # type: ignore
@@ -283,7 +287,7 @@ def verify_otp(
         otp = form.otp.data or ""
 
         try:
-            verify = register_service.verify_registration_otp(
+            result = register_service.complete_registration_with_otp(
                 email=email,
                 submitted_otp=otp,
             )
@@ -299,30 +303,23 @@ def verify_otp(
                 form=form,
             )
 
-        if verify.success:
-
-            new_user = register_service.add_user_to_db(
-                email=email,
-            )
+        if result.success and result.user is not None:
 
             # i need to make sure this is using the flask-login class
             login_user(
                 user=FlaskLoginUser(
-                    new_user,
+                    result.user,
                 )
             )
 
             flash(
-                "OTP verified successfully.",
-                "success",
+                "✅ OTP verified successfully! 🎉 You are now logged in.",
+                FlashCategory.SUCCESS,
             )
 
-            flash(
-                "You Are LOG In Successfully",
-                "success",
+            pop_key_from_session(
+                key=IdentitySessionKey.REGISTER_PENDING,
             )
-
-            pop_key_from_session(key=IdentitySessionKey.REGISTER_PENDING)
 
             return redirect(
                 url_for(

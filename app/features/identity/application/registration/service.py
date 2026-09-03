@@ -31,7 +31,7 @@ from .dto import (
 from ...domain.repositories.user_repository import UserRepository
 from ...domain.entities.user import UserDomain
 
-from .otp import send_otp_to_email, verify_otp_against_email
+from ..otp.service import send_otp_to_email, verify_otp_against_email
 
 
 class RegistrationService:
@@ -166,7 +166,7 @@ class RegistrationService:
         self,
         email: str,
         submitted_otp: str,
-    ):
+    ) -> RegistrationViaOTPResult:
         """
         For success it will insert data into the db
         and then if wrong any then it will raise a error

@@ -19,6 +19,17 @@ class RegistrationStatus(StrEnum):
     EMAIL_SERVICE_FAILED = "email_service_failed"
 
 
+class LoginStatus(StrEnum):
+    OTP_SENT = "otp_sent"
+    NO_ACCOUNT = "no_account"
+    PROBLEM = "problem"
+
+
+class LoginOTPStatus(StrEnum):
+    VERIFIED = "verified"
+    NOT_VERIFIED = "not_verified"
+
+
 class AfterRegistrationNextStep(StrEnum):
     ENTER_PASSWORD = "enter_password"
     VERIFY_OTP = "verify_otp"

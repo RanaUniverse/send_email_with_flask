@@ -23,9 +23,9 @@ from flask_login import (  # type: ignore
     login_user,  # type: ignore
     logout_user,
 )
-
+from ..domain.enums import LoginStatus
 from ..domain.exceptions import InvalidEmailError
-from .forms import LoginForm, RegisterForm, OTPForm
+from .forms import LoginForm, RegisterForm, OTPForm, LoginWithOtpForm
 from ..dependencies import RegistrationServiceDep, LoginServiceDep
 from .message import FlashCategory
 
@@ -40,9 +40,12 @@ from app.shared.otp.enums import OTPPurpose
 
 from app.shared.session.enums import IdentitySessionKey
 from app.shared.session.service import (
+    set_identity_key as set_identity_key_in_session,
     pop_key as pop_key_from_session,
     get_identity_email as get_identity_email_from_session,
 )
+
+from .login_response import get_required_email
 
 # TODO  i will later change this to call the service which will call the otp
 
@@ -54,131 +57,6 @@ auth_bp = Blueprint(
     static_folder="static",
     static_url_path="/identity_static",
 )
-
-
-@auth_bp.route(
-    "/login",
-    methods=["GET", "POST"],
-)
-def login(
-    login_service: LoginServiceDep,
-):
-
-    form = LoginForm()
-
-    if form.validate_on_submit():  # type: ignore
-        email = form.email.data or ""
-        password = form.password.data or ""
-
-        user_obj = login_service.check_authentication(
-            email=email,
-            password=password,
-        )
-
-        if user_obj:
-            login_user(user=user_obj)
-            flash(
-                message="Login Successful",
-                category="success",
-            )
-            return redirect(url_for("general_bp.home_page"))
-        else:
-            flash(
-                message="Wrong Credentials",
-                category="warning",
-            )
-            return (
-                render_template(
-                    template_name_or_list="auth/login.html",
-                    form=form,
-                ),
-                401,
-            )
-
-    return render_template(
-        template_name_or_list="auth/login.html",
-        form=form,
-    )
-
-
-@auth_bp.route(rule="/logout")
-@login_required
-def logout():
-    logout_user()
-    flash(
-        message="You have been logout goodly",
-        category="danger",
-    )
-    return redirect(location=url_for("general_bp.home_page"))
-
-
-@auth_bp.route(
-    rule="/login-with-password",
-    methods=["GET", "POST"],
-)
-def login_with_password(
-    login_service: LoginServiceDep,
-):
-    """
-    This will take the email id and ask for the password to enter
-
-    Currently this is for coming from register
-
-    I will make this workable with login routes goodly and logically
-    """
-
-    email = get_identity_email_from_session(
-        IdentitySessionKey.LOGIN_PENDING,
-    )
-
-    if email is None:
-        flash(
-            "Please Enter your email and password to login",
-            "warning",
-        )
-        return redirect(
-            url_for(
-                "auth_bp.login",
-            )
-        )
-
-    form = LoginForm()
-
-    if form.validate_on_submit():  # type: ignore
-        password = form.password.data or ""
-        user_obj = login_service.check_authentication(
-            email=email,
-            password=password,
-        )
-
-        if user_obj:
-            login_user(
-                user=user_obj,
-            )
-            pop_key_from_session(
-                key=IdentitySessionKey.LOGIN_PENDING,
-            )
-            flash(
-                "Login Successfull",
-                "success",
-            )
-
-            return redirect(
-                url_for(
-                    "general_bp.home_page",
-                )
-            )
-
-        flash(
-            "wrong Password",
-            "warning",
-        )
-
-    return render_template(
-        "auth/login_with_password.html",
-        form=form,
-        email=email,
-    )
 
 
 @auth_bp.route(
@@ -239,7 +117,7 @@ def register(
             FlashCategory.WARNING,
         )
 
-        return redirect(url_for("auth_bp.verify_otp"))
+        return redirect(url_for("auth_bp.verify_registration_otp"))
 
     return render_template(
         template_name_or_list="auth/register.html",
@@ -251,7 +129,7 @@ def register(
     "/verify-otp",
     methods=["GET", "POST"],
 )
-def verify_otp(
+def verify_registration_otp(
     register_service: RegistrationServiceDep,
 ):
     """
@@ -305,13 +183,6 @@ def verify_otp(
 
         if result.success and result.user is not None:
 
-            # i need to make sure this is using the flask-login class
-            login_user(
-                user=FlaskLoginUser(
-                    result.user,
-                )
-            )
-
             flash(
                 "✅ OTP verified successfully! 🎉 You are now logged in.",
                 FlashCategory.SUCCESS,
@@ -320,7 +191,16 @@ def verify_otp(
             pop_key_from_session(
                 key=IdentitySessionKey.REGISTER_PENDING,
             )
+            pop_key_from_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+            )
 
+            # i need to make sure this is using the flask-login class
+            login_user(
+                user=FlaskLoginUser(
+                    result.user,
+                )
+            )
             return redirect(
                 url_for(
                     "general_bp.home_page",
@@ -381,3 +261,347 @@ def resend_registration_otp():
             "auth_bp.verify_otp",
         )
     )
+
+
+@auth_bp.route(
+    "/login",
+    methods=[
+        "GET",
+        "POST",
+    ],
+)
+def login(
+    login_service: LoginServiceDep,
+):
+    # it will first if login_pending session is ther or not then do shows
+    # thigns here based on login with otp or with password
+
+    form = LoginForm()
+
+    if form.validate_on_submit():  # type: ignore
+        email = form.email.data or ""
+        password = form.password.data or ""
+
+        user_obj = login_service.check_authentication(
+            email=email,
+            password=password,
+        )
+
+        if user_obj:
+            login_user(user=user_obj)
+            flash(
+                message="Login Successful",
+                category="success",
+            )
+            return redirect(url_for("general_bp.home_page"))
+        else:
+            flash(
+                message="Wrong Credentials",
+                category="warning",
+            )
+            return (
+                render_template(
+                    template_name_or_list="auth/login.html",
+                    form=form,
+                ),
+                401,
+            )
+
+    return render_template(
+        template_name_or_list="auth/login.html",
+        form=form,
+    )
+
+
+@auth_bp.route(
+    rule="/login-with-otp",
+    methods=["GET", "POST"],
+)
+def login_with_otp(
+    login_service: LoginServiceDep,
+):
+    """
+    Start the email OTP login flow.
+
+    GET:
+        Show the email form.
+
+    POST:
+        Ask the login service to send a login OTP.
+        On success, store the pending email in the session
+        and redirect to OTP verification.
+    """
+
+    form = LoginWithOtpForm()
+
+    if form.validate_on_submit():  # type: ignore
+
+        email = form.email.data or ""
+
+        try:
+            result = login_service.send_otp_for_login(
+                email=email,
+            )
+
+        except InvalidEmailError as e:
+            flash(
+                message=str(e),
+                category=FlashCategory.DANGER,
+            )
+
+            return render_template(
+                "auth/login_with_otp.html",
+                form=form,
+            )
+
+        if result.status == LoginStatus.OTP_SENT:
+
+            validated_email = get_required_email(
+                result=result,
+            )
+
+            if validated_email is None:
+                flash(
+                    "Something went wrong. Please try again with another details.",
+                    "danger",
+                )
+                return redirect(url_for("auth_bp.login"))
+
+            set_identity_key_in_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+                email_value=validated_email,
+            )
+
+            flash(
+                message="📧 Login code sent! Check your email to continue.",
+                category=FlashCategory.SUCCESS,
+            )
+
+            return redirect(
+                url_for(
+                    "auth_bp.verify_login_otp",
+                )
+            )
+
+        elif result.status == LoginStatus.NO_ACCOUNT:
+            flash(
+                message=(
+                    "No account was found with this email. " "Please register first."
+                ),
+                category=FlashCategory.WARNING,
+            )
+            return redirect(url_for("auth_bp.register"))
+
+        elif result.status == LoginStatus.PROBLEM:
+            flash(
+                message=(
+                    "We couldn't start OTP login right now. "
+                    "Please try again in a moment."
+                ),
+                category=FlashCategory.WARNING,
+            )
+
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(
+                message=f"{field.upper()}: {error}",
+                category=FlashCategory.WARNING,
+            )
+
+    return render_template(
+        "auth/login_with_otp.html",
+        form=form,
+    )
+
+
+@auth_bp.route(
+    rule="/verify-login-otp",
+    methods=["GET", "POST"],
+)
+def verify_login_otp(
+    login_service: LoginServiceDep,
+):
+    """
+    Verify the OTP that was sent during the login-with-OTP flow. The email is taken from the pending-login session rather than from the request itself.
+    """
+
+    email = get_identity_email_from_session(
+        IdentitySessionKey.LOGIN_PENDING,
+    )
+
+    if email is None:
+        flash(
+            message=(
+                "No login attempt is currently pending. "
+                "Please enter your email first."
+            ),
+            category=FlashCategory.WARNING,
+        )
+
+        return redirect(url_for("auth_bp.login_with_otp"))
+
+    policy = get_otp_policy_obj(
+        purpose=OTPPurpose.LOGIN,
+    )
+
+    form = OTPForm(
+        otp_length=policy.length,
+    )
+
+    if form.validate_on_submit():  # type: ignore
+
+        submitted_otp = form.otp.data or ""
+        try:
+            result = login_service.complete_login_with_otp(
+                email=email,
+                submitted_otp=submitted_otp,
+            )
+        except InvalidEmailError as e:
+            flash(
+                message=str(e) + f" Please Use Valid Email id on Registration",
+                category=FlashCategory.DANGER,
+            )
+            return render_template("auth/verify_login_otp.html")
+
+        if result.success and result.user is not None:
+            login_user(
+                user=FlaskLoginUser(
+                    result.user,
+                )
+            )
+            pop_key_from_session(
+                key=IdentitySessionKey.REGISTER_PENDING,
+            )
+            pop_key_from_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+            )
+            # TODO maybe i will also remove the registerion pending session
+            flash(
+                message="✅ OTP verified successfully! 🎉 You are now logged in.",
+                category=FlashCategory.SUCCESS,
+            )
+            return redirect(url_for("general_bp.home_page"))
+
+        # This line means not success
+        flash(
+            message="Invalid or Expired OTP, Please Try Again",
+            category=FlashCategory.DANGER,
+        )
+        return render_template(
+            "auth/verify_login_otp.html",
+            form=form,
+            email=email,
+        )
+
+        # result = login_service.
+        # this will verify the otp and then allow to login the user
+
+    return render_template(
+        template_name_or_list="auth/verify_login_otp.html",
+        form=form,
+        email=email,
+    )
+
+
+@auth_bp.route(rule="/resend-registration-otp", methods=["POST"])
+def resend_login_otp():
+    """
+    Here i need to decide if the otp sending will done now or not
+    then only i will send the otp.
+    """
+    # TODO: implement OTP resend logic where i am sending same
+    # or differnet otp based on implimentations
+
+    flash(
+        message="📨 A new OTP will be sent here for login.",
+        category=FlashCategory.INFO,
+    )
+
+    return redirect(
+        url_for(
+            "auth_bp.verify_login_otp",
+        )
+    )
+
+
+@auth_bp.route(
+    rule="/login-with-password",
+    methods=["GET", "POST"],
+)
+def login_with_password(
+    login_service: LoginServiceDep,
+):
+    """
+    This will take the email id and ask for the password to enter
+
+    Currently this is for coming from register
+
+    I will make this workable with login routes goodly and logically
+    """
+
+    email = get_identity_email_from_session(
+        IdentitySessionKey.LOGIN_PENDING,
+    )
+
+    if email is None:
+        flash(
+            "Please Enter your email and password to login",
+            "warning",
+        )
+        return redirect(
+            url_for(
+                "auth_bp.login",
+            )
+        )
+
+    form = LoginForm()
+
+    if form.validate_on_submit():  # type: ignore
+        password = form.password.data or ""
+        user_obj = login_service.check_authentication(
+            email=email,
+            password=password,
+        )
+
+        if user_obj:
+            login_user(
+                user=user_obj,
+            )
+            pop_key_from_session(
+                key=IdentitySessionKey.REGISTER_PENDING,
+            )
+            pop_key_from_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+            )
+            flash(
+                "Login Successfull",
+                "success",
+            )
+
+            return redirect(
+                url_for(
+                    "general_bp.home_page",
+                )
+            )
+
+        flash(
+            "wrong Password",
+            "warning",
+        )
+
+    return render_template(
+        "auth/login_with_password.html",
+        form=form,
+        email=email,
+    )
+
+
+@auth_bp.route(rule="/logout")
+@login_required
+def logout():
+    logout_user()
+    flash(
+        message="You have been logout goodly",
+        category="danger",
+    )
+    return redirect(location=url_for("general_bp.home_page"))

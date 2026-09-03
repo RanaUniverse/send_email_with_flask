@@ -72,7 +72,7 @@ def handle_registration_result(
 
             return redirect(
                 url_for(
-                    "auth_bp.verify_otp",
+                    "auth_bp.verify_registration_otp",
                 )
             )
 

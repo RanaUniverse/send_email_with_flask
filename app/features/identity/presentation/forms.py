@@ -59,6 +59,14 @@ class LoginForm(FlaskForm, EmailMixin):
     )
 
 
+class LoginWithOtpForm(FlaskForm, EmailMixin):
+    """
+    This will only shows the email id enter form
+    """
+
+    submit = SubmitField(label="Send Login OTP")
+
+
 class RegisterForm(FlaskForm, EmailMixin):
     submit = SubmitField(
         label="Register New Account",

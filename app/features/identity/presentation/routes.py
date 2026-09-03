@@ -76,9 +76,11 @@ def register(
     if form.validate_on_submit():  # type: ignore
 
         email = form.email.data or ""
+        phone_number = form.phone.data or ""
         try:
-            result = register_service.start_registration(
+            result = register_service.start(
                 email=email,
+                phone=phone_number,
             )
 
         except InvalidEmailError as e:
@@ -87,7 +89,7 @@ def register(
                 category="danger",
             )
             return render_template(
-                "auth/register.html",
+                "auth/register_page.html",
                 form=form,
             )
 
@@ -107,8 +109,8 @@ def register(
         IdentitySessionKey.REGISTER_PENDING,
     )
 
-    # This below condition is for showing the user otp page if he already
-    # ask for the registration some time ago and come to /register again
+    # Resume OTP verification for a pending registration
+
     if pending_email is not None:
         # later i will add redis checking if possible #TODO
         flash(
@@ -117,22 +119,27 @@ def register(
             FlashCategory.WARNING,
         )
 
-        return redirect(url_for("auth_bp.verify_registration_otp"))
+        return redirect(
+            url_for(
+                "auth_bp.verify_registration_otp",
+            )
+        )
 
     return render_template(
-        template_name_or_list="auth/register.html",
+        template_name_or_list="auth/register_page.html",
         form=form,
     )
 
 
 @auth_bp.route(
-    "/verify-otp",
+    "/verify-register-otp",
     methods=["GET", "POST"],
 )
 def verify_registration_otp(
     register_service: RegistrationServiceDep,
 ):
     """
+    After the /register send otp then this page comes
     As this function should to run after the registration has done
     so i need to check if user comes externally or not also
     """
@@ -143,7 +150,8 @@ def verify_registration_otp(
 
     if email is None:
         flash(
-            message="First Register Your Account with Email ID then verify your account",
+            message="First Register Your Account with Email "
+            "ID then verify your account",
             category=FlashCategory.WARNING,
         )
         return redirect(
@@ -165,7 +173,7 @@ def verify_registration_otp(
         otp = form.otp.data or ""
 
         try:
-            result = register_service.complete_registration_with_otp(
+            result = register_service.email_otp_verify(
                 email=email,
                 submitted_otp=otp,
             )
@@ -177,7 +185,7 @@ def verify_registration_otp(
             )
 
             return render_template(
-                "auth/verify_otp.html",
+                "auth/verify_register_otp.html",
                 form=form,
             )
 
@@ -213,7 +221,7 @@ def verify_registration_otp(
         )
 
     return render_template(
-        "auth/verify_otp.html",
+        "auth/verify_register_otp.html",
         form=form,
         email=email,
     )
@@ -227,8 +235,11 @@ def verify_registration_otp(
 )
 def change_registration_email():
     """
+    When the verify_registe_otp page is showsing there is a link
+    to refere this page by which this will run
     When this request will come i need to check if the user
     """
+
     pop_key_from_session(
         key=IdentitySessionKey.REGISTER_PENDING,
     )
@@ -242,24 +253,46 @@ def change_registration_email():
     return redirect(url_for("auth_bp.register"))
 
 
-@auth_bp.route(rule="/resend-registration-otp", methods=["POST"])
-def resend_registration_otp():
+@auth_bp.route(
+    rule="/resend-registration-otp",
+    methods=[
+        "POST",
+    ],
+)
+def resend_registration_otp(
+    register_service: RegistrationServiceDep,
+):
     """
     Here i need to decide if the otp sending will done now or not
     then only i will send the otp.
     """
     # TODO: implement OTP resend logic where i am sending same
     # or differnet otp based on implimentations
-
-    flash(
-        message="📨 A new OTP will be sent here.",
-        category=FlashCategory.INFO,
+    email = get_identity_email_from_session(
+        key=IdentitySessionKey.REGISTER_PENDING,
     )
 
-    return redirect(
-        url_for(
-            "auth_bp.verify_otp",
+    if email is None:
+        flash(
+            message="First Register Your Account with Email "
+            "ID then verify your account",
+            category=FlashCategory.WARNING,
         )
+        return redirect(
+            url_for(
+                "auth_bp.register",
+            )
+        )
+
+    flash(
+        message="📨 A new OTP will be sent in Your Email ID.",
+        category=FlashCategory.INFO,
+    )
+    result = register_service.resend_otp(
+        email=email,
+    )
+    return handle_registration_result(
+        result=result,
     )
 
 

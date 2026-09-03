@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 
 from ..domain.enums import RegistrationStatus
-from ..application.registration.dto import RegistrationResult
+from ..application.registration.dto import RegistrationStartingResult
 
 from app.shared.frontend.enums import FlashCategory
 
@@ -23,7 +23,7 @@ class PresentationMessageFlask(BaseModel):
 
 
 def registration_to_flash(
-    result: RegistrationResult,
+    result: RegistrationStartingResult,
 ) -> PresentationMessageFlask:
     """
     This will take the result of the service.py and make this

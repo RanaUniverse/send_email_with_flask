@@ -35,6 +35,8 @@ def send_otp_to_email(
     purpose: OTPPurpose,
 ) -> OTPSendResult:
     """
+    I will add Celery here which will send email later
+
     Here i need to pass the correct validated email id
     which is not register/login or what so ever in the database and then
     it will just try to send otp to him

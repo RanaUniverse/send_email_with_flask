@@ -19,17 +19,6 @@ class RegistrationStatus(StrEnum):
     EMAIL_SERVICE_FAILED = "email_service_failed"
 
 
-class LoginStatus(StrEnum):
-    OTP_SENT = "otp_sent"
-    NO_ACCOUNT = "no_account"
-    PROBLEM = "problem"
-
-
-class LoginOTPStatus(StrEnum):
-    VERIFIED = "verified"
-    NOT_VERIFIED = "not_verified"
-
-
 class AfterRegistrationNextStep(StrEnum):
     ENTER_PASSWORD = "enter_password"
     VERIFY_OTP = "verify_otp"
@@ -45,11 +34,20 @@ class RegistrationOTPStatus(StrEnum):
     INVALID_OTP = "invalid_otp"
     OTP_NOT_FOUND = "otp_not_found"
     ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"
-    NOT_VERIFIED = "not_verified"
-    # This last one is a generic one i need later not try to use why not
 
 
 class RegistrationOTPStatusNextStep(StrEnum):
     SET_PASSWORD = "set_password"
     RETRY_OTP = "retry_otp"
     RESTART_REGISTRATION = "restart_registration"
+
+
+class LoginStatus(StrEnum):
+    OTP_SENT = "otp_sent"
+    NO_ACCOUNT = "no_account"
+    PROBLEM = "problem"
+
+
+class LoginOTPStatus(StrEnum):
+    VERIFIED = "verified"
+    NOT_VERIFIED = "not_verified"

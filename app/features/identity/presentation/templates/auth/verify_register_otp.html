@@ -1,5 +1,5 @@
 {#
-app/features/identity/presentation/templates/auth/verify_otp.html
+app/features/identity/presentation/templates/auth/verify_register_otp.html
 
 verify otp page to shows here
 #}
@@ -116,7 +116,10 @@ verify otp page to shows here
                             <button type="submit" id="resend-otp-btn" class="btn btn-link btn-sm text-decoration-none"
                                 disabled>
                                 {# i can pass the value as int my js will convert it automatically #}
-                                Resend OTP in <span id="otp-countdown">31</span>s
+                                Resend OTP in
+                                <span id="otp-countdown">
+                                    5
+                                </span>s
                             </button>
                         </form>
 

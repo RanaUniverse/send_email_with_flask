@@ -12,29 +12,39 @@ from flask import (
 )
 
 
-from ..application.registration.dto import RegistrationResult
+from ..application.registration.dto import RegistrationStartingResult
 from ..domain.enums import AfterRegistrationNextStep
 
+from app.shared.frontend.enums import FlashCategory
 from app.shared.session.enums import IdentitySessionKey
 from app.shared.session.service import set_identity_key as set_identity_key_in_session
 from .message import registration_to_flash
 
+# def get_required_email(
+#     result: RegistrationResult,
+# ) -> str | None:
+#     """
+#     From the registration result it will give me his email
+#     """
 
-def _get_required_email(
-    result: RegistrationResult,
-) -> str | None:
-    if result.identity is None:
-        return None
+#     if result.identity is None:
+#         return None
 
-    return result.identity.email
+#     return result.identity.email
+
+
+# def get_registration_identity(
+#     result: RegistrationResult,
+# ) -> RegistrationIdentity | None:
+#     return result.identity
 
 
 def handle_registration_result(
-    result: RegistrationResult,
+    result: RegistrationStartingResult,
 ):
     """
-    From the routes function i will decide waht to do here based
-    on the registration result so that my routes.py will be clean
+    This fun is like the same level of the routes.py function
+    This will just a extension not to write in the fun but keep here
     """
 
     information = registration_to_flash(
@@ -46,28 +56,24 @@ def handle_registration_result(
         category=information.category,
     )
     # later i will think how i can add phone, email or somethig username
+    identity = result.identity
 
-    email = _get_required_email(
-        result=result,
-    )
-
-    # maybe later when i will phone, or somethigns different i
-    # will need to change the logic in session storage and also this
-    if email is None:
+    if identity is None:
+        # i wish this will not happens
         flash(
-            "Something went wrong. Please try again with another details.",
-            "danger",
+            message="Somethign is wron ghere, ",
+            category=FlashCategory.WARNING,
         )
         return redirect(url_for("auth_bp.register"))
 
-    # the emal = str|None, so how i can tackle the None or no need
     match result.next_step:
 
         case AfterRegistrationNextStep.VERIFY_OTP:
 
             set_identity_key_in_session(
                 key=IdentitySessionKey.REGISTER_PENDING,
-                email_value=email,
+                email_value=identity.email,
+                phone_value=identity.phone,
             )
 
             return redirect(
@@ -79,8 +85,10 @@ def handle_registration_result(
         case AfterRegistrationNextStep.ENTER_PASSWORD:
             set_identity_key_in_session(
                 key=IdentitySessionKey.LOGIN_PENDING,
-                email_value=email,
+                email_value=identity.email,
+                phone_value=identity.phone,
             )
+            # later in time of login with password i need check phone number
             return redirect(
                 url_for(
                     "auth_bp.login_with_password",

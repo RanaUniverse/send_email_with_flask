@@ -1,5 +1,5 @@
 {#
-app/features/identity/presentation/templates/auth/register.html
+app/features/identity/presentation/templates/auth/register_page.html
 
 Here i will write the register form fillup page
 #}
@@ -63,6 +63,29 @@ Here i will write the register form fillup page
 
                             <div class="form-text">
                                 We'll send a verification code to this email.
+                            </div>
+
+                        </div>
+                        <div class="mb-4">
+
+                            {{ form.phone.label(
+                            class="form-label fw-semibold"
+                            ) }}
+
+                            {{ form.phone(
+                            class="form-control form-control-lg",
+                            placeholder="Enter your Phone Number",
+                            autocomplete="email"
+                            ) }}
+
+                            {% for error in form.phone.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+
+                            <div class="form-text">
+                                Phone Number Can Be used to Place Order Online
                             </div>
 
                         </div>

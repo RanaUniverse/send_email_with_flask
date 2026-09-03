@@ -15,7 +15,25 @@ from wtforms import (
     EmailField,
 )
 
-from wtforms.validators import DataRequired, Length, Email
+from wtforms.validators import DataRequired, Length, Email, Optional
+
+
+class PhoneNumberMixin:
+    phone = StringField(
+        label="Phone Number(Optional)",
+        validators=[
+            Optional(),
+            Length(
+                min=10,
+                max=10,
+                message="Phone Number Must Be %(min)d Digits",
+            ),
+        ],
+        render_kw={
+            "autocomplete": "tel",
+            "inputmode": "tel",
+        },
+    )
 
 
 class EmailMixin:
@@ -67,7 +85,11 @@ class LoginWithOtpForm(FlaskForm, EmailMixin):
     submit = SubmitField(label="Send Login OTP")
 
 
-class RegisterForm(FlaskForm, EmailMixin):
+class RegisterForm(
+    FlaskForm,
+    EmailMixin,
+    PhoneNumberMixin,
+):
     submit = SubmitField(
         label="Register New Account",
     )

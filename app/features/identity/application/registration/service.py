@@ -2,6 +2,9 @@
 app/features/identity/services/registration.py
 
 Registration related code fun and so on will be present here
+
+start, resend_otp have duplicaion i need to remove those
+#TODO
 """
 
 from pydantic import EmailStr
@@ -10,6 +13,7 @@ from pydantic import EmailStr
 from app.shared.otp.enums import (
     OTPPurpose,
     OTPSendStatus,
+    OTPVerifyStatus,
 )
 
 from ...domain.value_objects.email_validation import ValidatedEmail
@@ -22,7 +26,7 @@ from ...domain.enums import (
 )
 
 from .dto import (
-    RegistrationResult,
+    RegistrationStartingResult,
     RegistrationViaOTPResult,
     RegistrationIdentity,
 )
@@ -64,10 +68,11 @@ class RegistrationService:
 
         return new_user
 
-    def start_registration(
+    def start(
         self,
         email: str,
-    ) -> RegistrationResult:
+        phone: str | None = None,
+    ) -> RegistrationStartingResult:
         """
         #TODO
         For now local development i am sending mail directly later
@@ -88,9 +93,11 @@ class RegistrationService:
         except InvalidEmailError:
             # my routes can handle this error there and say user
             raise
+
         #  i am passing this object so that my routes can decide to do with this
         identity_obj = RegistrationIdentity(
             email=validated_email_id,
+            phone=phone,
         )
 
         existing_user = self._user_repository.exists_by_email(
@@ -98,14 +105,13 @@ class RegistrationService:
         )
 
         if existing_user:
-            x = RegistrationResult(
+            x = RegistrationStartingResult(
                 status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
                 next_step=AfterRegistrationNextStep.ENTER_PASSWORD,
                 identity=identity_obj,
             )
             return x
 
-        # i am calling a fun which call the backend's email send
         otp_send = send_otp_to_email(
             email_id=validated_email_id,
             purpose=OTPPurpose.REGISTER,
@@ -115,7 +121,7 @@ class RegistrationService:
         # in the interface layer of how to do shows the data
 
         if otp_send.success:
-            x = RegistrationResult(
+            x = RegistrationStartingResult(
                 status=RegistrationStatus.OTP_SENT,
                 next_step=AfterRegistrationNextStep.VERIFY_OTP,
                 identity=identity_obj,
@@ -123,21 +129,21 @@ class RegistrationService:
             return x
 
         elif otp_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
-            return RegistrationResult(
+            return RegistrationStartingResult(
                 status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
                 identity=identity_obj,
             )
 
         elif otp_send.status == OTPSendStatus.EMAIL_BLOCKED:
-            return RegistrationResult(
+            return RegistrationStartingResult(
                 status=RegistrationStatus.EMAIL_BLOCKED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
                 identity=identity_obj,
             )
 
         elif otp_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
-            return RegistrationResult(
+            return RegistrationStartingResult(
                 status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
                 identity=identity_obj,
@@ -147,14 +153,14 @@ class RegistrationService:
             OTPSendStatus.SEND_FAILED,
             OTPSendStatus.EMAIL_SERVER_FAILED,
         ):
-            return RegistrationResult(
+            return RegistrationStartingResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
                 identity=identity_obj,
             )
 
         else:
-            x = RegistrationResult(
+            x = RegistrationStartingResult(
                 status=RegistrationStatus.EMAIL_SERVICE_FAILED,
                 next_step=AfterRegistrationNextStep.SHOW_ERROR,
                 identity=identity_obj,
@@ -162,7 +168,7 @@ class RegistrationService:
 
             return x
 
-    def complete_registration_with_otp(
+    def email_otp_verify(
         self,
         email: str,
         submitted_otp: str,
@@ -184,23 +190,82 @@ class RegistrationService:
         except InvalidEmailError:
             raise
 
-        # here i think to add some logic to check before
-        # if user has attempt exceed like this or not
         verify = verify_otp_against_email(
             email=validated_email_id,
             purpose=OTPPurpose.REGISTER,
             submitted_otp=submitted_otp,
         )
 
-        if verify.success:
-            new_user = self._add_user_to_db(
-                email=validated_email_id,
-            )
-            return RegistrationViaOTPResult(
-                status=RegistrationOTPStatus.VERIFIED,
-                user=new_user,
-            )
+        match verify.status:
+            case OTPVerifyStatus.VERIFIED:
+                new_user = self._add_user_to_db(
+                    email=validated_email_id,
+                )
+                return RegistrationViaOTPResult(
+                    status=RegistrationOTPStatus.VERIFIED,
+                    user=new_user,
+                )
 
-        return RegistrationViaOTPResult(
-            status=RegistrationOTPStatus.NOT_VERIFIED,
+            case OTPVerifyStatus.INVALID_OTP:
+                return RegistrationViaOTPResult(
+                    status=RegistrationOTPStatus.INVALID_OTP,
+                )
+
+            case OTPVerifyStatus.OTP_NOT_FOUND:
+                return RegistrationViaOTPResult(
+                    status=RegistrationOTPStatus.OTP_NOT_FOUND,
+                )
+
+            case OTPVerifyStatus.ATTEMPT_LIMIT_EXCEEDED:
+                return RegistrationViaOTPResult(
+                    status=RegistrationOTPStatus.ATTEMPT_LIMIT_EXCEEDED,
+                )
+
+    def resend_otp(
+        self,
+        email: str,
+        phone: str | None = None,
+    ) -> RegistrationStartingResult:
+        """
+        i will need to impliment the phone number later
+        """
+        obj = self.start(
+            email=email,
+            phone=phone,
         )
+        return obj
+
+        # try:
+        #     validated_email = ValidatedEmail(
+        #         email_id=email,
+        #     ).value
+        # except InvalidEmailError:
+        #     raise
+
+        # otp_send = send_otp_to_email(
+        #     email_id=validated_email,
+        #     purpose=OTPPurpose.REGISTER,
+        # )
+
+        # if otp_send.success:
+        #     return RegistrationStartingResult(
+        #         status=RegistrationStatus.OTP_SENT,
+        #         next_step=AfterRegistrationNextStep.VERIFY_OTP,
+        #     )
+
+        # if otp_send.status == OTPSendStatus.COOLDOWN_ACTIVE:
+        #     return RegistrationStartingResult(
+        #         status=RegistrationStatus.OTP_COOLDOWN_ACTIVE,
+        #         next_step=AfterRegistrationNextStep.SHOW_ERROR,
+        #     )
+
+        # if otp_send.status == OTPSendStatus.ATTEMPT_LIMIT_EXCEEDED:
+        #     return RegistrationStartingResult(
+        #         status=RegistrationStatus.ATTEMPT_LIMIT_EXCEED,
+        #         next_step=AfterRegistrationNextStep.SHOW_ERROR,
+        #     )
+
+        # return RegistrationStartingResult(
+        #     status=RegistrationStatus.EMAIL_SERVICE_FAILED,
+        #     next_step=AfterRegistrationNextStep.SHOW_ERROR,
+        # )

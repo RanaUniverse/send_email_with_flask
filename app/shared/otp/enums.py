@@ -50,6 +50,6 @@ class OTPVerifyStatus(StrEnum):
     """
 
     VERIFIED = "verified"
-    OTP_NOT_FOUND = "otp_not_found"
     INVALID_OTP = "invalid_otp"
+    OTP_NOT_FOUND = "otp_not_found"
     ATTEMPT_LIMIT_EXCEEDED = "attempt_limit_exceeded"

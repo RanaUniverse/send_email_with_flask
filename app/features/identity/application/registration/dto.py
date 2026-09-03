@@ -33,7 +33,7 @@ class RegistrationIdentity:
             raise ValueError("At least one identity must be provided.")
 
 
-class RegistrationResult(BaseModel):
+class RegistrationStartingResult(BaseModel):
     """
     This is for Frontend, this result will use by routes.py
     to check where to redirect the user based on the result

@@ -9,6 +9,9 @@ Here i will keep login related things
 
 """
 
+from typing import cast
+
+
 from flask import (
     Blueprint,
     flash,
@@ -22,10 +25,11 @@ from flask_login import (  # type: ignore
     login_required,  # type: ignore
     login_user,  # type: ignore
     logout_user,
+    current_user,
 )
 from ..domain.enums import LoginStatus
 from ..domain.exceptions import InvalidEmailError
-from .forms import LoginForm, RegisterForm, OTPForm, LoginWithOtpForm
+from .forms import LoginForm, RegisterForm, OTPForm, LoginWithOtpForm, SetPasswordForm
 from ..dependencies import RegistrationServiceDep, LoginServiceDep
 from .message import FlashCategory
 
@@ -207,7 +211,7 @@ def verify_registration_otp(
             login_user(
                 user=FlaskLoginUser(
                     result.user,
-                )
+                ),
             )
             return redirect(
                 url_for(
@@ -321,7 +325,11 @@ def login(
         )
 
         if user_obj:
-            login_user(user=user_obj)
+            login_user(
+                user=FlaskLoginUser(
+                    user_obj,
+                )
+            )
             flash(
                 message="Login Successful",
                 category="success",
@@ -632,6 +640,60 @@ def resend_login_otp():
         url_for(
             "auth_bp.verify_login_otp",
         )
+    )
+
+
+# later i will want ot make this fresh login here
+@auth_bp.route(
+    rule="/set-password",
+    methods=[
+        "GET",
+        "POST",
+    ],
+)
+@login_required
+def set_password(
+    register_service: RegistrationServiceDep,
+    # i will later think about this service or change one
+):
+    """
+    Here i will use to set a password after he will register successfully
+    this page will later i will add after otp verify on /register
+    for now i will keep this in the profile page
+    """
+    if not current_user.is_authenticated:
+        flash(
+            "This shoudl not happens without login, contact admin",
+            FlashCategory.WARNING,
+        )
+        return redirect(url_for("auth_bp.login"))
+
+    user = cast(FlaskLoginUser, current_user)
+
+    full_name = user.domain_user.full_name or "You"
+
+    form = SetPasswordForm()
+
+    if form.validate_on_submit():  # type: ignore
+        password = form.password.data
+        if not password:
+            flash("Password Need to given must")
+            return redirect(url_for("auth_bp.register"))
+        updated_user = register_service.set_password(
+            user.get_id(),
+            password=password,
+        )
+        msg = f"Your New Password: {password}, new obje: {updated_user}"
+        return msg
+
+    flash(
+        f"Hello {full_name}, Please Enter Password if you want "
+        "to login with password next time",
+        FlashCategory.SECONDARY,
+    )
+    return render_template(
+        "auth/set_password.html",
+        form=form,
     )
 
 

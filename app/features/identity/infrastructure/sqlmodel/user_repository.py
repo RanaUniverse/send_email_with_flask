@@ -12,6 +12,9 @@ for the sqlmodel i will write code here
 from ...domain.repositories.user_repository import UserRepository
 
 from ...domain.entities.user import UserDomain
+from ....identity.domain.exceptions import MyAppLogicError
+
+# TODO i need to sure if this import is allow or not
 
 
 from sqlmodel import Session, select
@@ -101,3 +104,34 @@ class SQLModelUserRepository(UserRepository):
         entity_obj = to_domain(model_obj)
 
         return entity_obj
+
+    def update_password(
+        self,
+        user: UserDomain,
+        hashed_password: str,
+    ) -> UserDomain:
+        """
+        Thsi will take the userid from there and then try to fetch the user
+        and then it will update the user details
+
+        Raise:
+            MyAppLogicError
+        """
+        if not user.id_:
+            raise MyAppLogicError
+
+        model_obj = self._session.get(
+            UserModel,
+            user.id_,
+        )
+        if model_obj is None:
+            raise MyAppLogicError
+        model_obj.hashed_password = hashed_password
+
+        self._session.add(model_obj)
+        self._session.commit()
+        self._session.refresh(model_obj)
+
+        return to_domain(
+            model_obj=model_obj,
+        )

@@ -19,6 +19,9 @@ from app.shared.otp.enums import (
 from ...domain.value_objects.email_validation import ValidatedEmail
 from ...domain.exceptions import InvalidEmailError
 
+from ...domain.services.password_hasher import PasswordHasher
+
+
 from ...domain.enums import (
     AfterRegistrationNextStep,
     RegistrationOTPStatus,
@@ -50,8 +53,10 @@ class RegistrationService:
     def __init__(
         self,
         user_repository: UserRepository,
+        password_hasher: PasswordHasher,
     ) -> None:
 
+        self._password_hasher = password_hasher
         self._user_repository = user_repository
 
     def _add_user_to_db(
@@ -269,3 +274,27 @@ class RegistrationService:
         #     status=RegistrationStatus.EMAIL_SERVICE_FAILED,
         #     next_step=AfterRegistrationNextStep.SHOW_ERROR,
         # )
+
+    def set_password(
+        self,
+        user_id: str,
+        password: str,
+    ) -> UserDomain | None:
+        user = self._user_repository.get_by_id(
+            user_id=user_id,
+        )
+        if user is None:
+            return None
+
+        hashed_password = self._password_hasher.make_hash(
+            password=password,
+        )
+
+        user.hashed_password = hashed_password
+
+        self._user_repository.update_password(
+            user=user,
+            hashed_password=hashed_password,
+        )
+        return user
+

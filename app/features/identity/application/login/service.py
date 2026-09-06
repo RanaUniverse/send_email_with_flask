@@ -18,6 +18,7 @@ from ...domain.value_objects.email_validation import ValidatedEmail
 from ...domain.exceptions import InvalidEmailError
 
 from ..otp.service import send_otp_to_email, verify_otp_against_email
+from ...domain.services.password_hasher import PasswordHasher
 
 
 class LoginService:
@@ -28,9 +29,11 @@ class LoginService:
     def __init__(
         self,
         user_repository: UserRepository,
+        password_hasher: PasswordHasher,
     ) -> None:
 
         self._user_repository = user_repository
+        self._password_hasher = password_hasher
 
     def check_authentication(
         self,
@@ -49,9 +52,20 @@ class LoginService:
         )
         if not obj:
             return None
-        stored_password_hash = obj.hashed_password
 
-        if password == stored_password_hash:
+        stored_password_hash = obj.hashed_password
+        if stored_password_hash is None:
+            # i think this hsould be say user any problme is here
+            return None
+
+        # Thsi is coming from the userdomain i think this should be coming
+        # from the database directly
+        # if password == stored_password_hash:
+
+        if self._password_hasher.verify(
+            password=password,
+            hashed_password=stored_password_hash,
+        ):
             return obj
 
     def send_otp_for_login(

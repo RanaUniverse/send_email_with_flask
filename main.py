@@ -26,7 +26,7 @@ from app.features.general.routes import general_bp
 
 # from app.features.mail.routes import mail_bp
 
-from app.shared.extensions import login_manager, csrf
+from app.shared.extensions import login_manager, csrf, flask_bcrypt
 
 from app.shared.otp.runtime_validation import validate_all_otp_config
 
@@ -49,9 +49,15 @@ def create_app() -> DIFlask:
     login_manager.init_app(  # type: ignore
         app=app,
     )
+
     csrf.init_app(  # type: ignore
         app=app,
     )
+
+    flask_bcrypt.init_app(  # type: ignore
+        app=app,
+    )
+
     app.secret_key = settings.app.secret_key.get_secret_value()
 
     app.register_blueprint(blueprint=auth_bp)

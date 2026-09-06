@@ -39,6 +39,8 @@ from .infrastructure.sqlmodel.user_repository import SQLModelUserRepository
 from .infrastructure.in_memory.user_repository import InMemoryUserRepository
 from .infrastructure.mongo.user_repository import MongoDBUserRepository
 
+from .infrastructure.security.bcrypt_password_hasher import BcryptPasswordHasher
+
 from app.database.session import SessionDep
 
 # ============================================================
@@ -111,6 +113,7 @@ def get_registration_service(
 
     return RegistrationService(
         user_repository=user_repository,
+        password_hasher=BcryptPasswordHasher(),
     )
 
 
@@ -122,6 +125,7 @@ def get_login_service(
     """
     return LoginService(
         user_repository=user_repository,
+        password_hasher=BcryptPasswordHasher(),
     )
 
 

@@ -81,6 +81,8 @@ class InMemoryUserRepository:
 
         return user
 
+    def update_password(self, user: UserDomain, hashed_password: str) -> UserDomain: ...
+
     # def update(
     #     self,
     #     user: UserDomain,

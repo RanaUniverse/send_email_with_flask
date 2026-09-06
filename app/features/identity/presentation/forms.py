@@ -15,7 +15,13 @@ from wtforms import (
     EmailField,
 )
 
-from wtforms.validators import DataRequired, Length, Email, Optional
+from wtforms.validators import (
+    DataRequired,
+    Length,
+    Email,
+    Optional,
+    # EqualTo,
+)
 
 
 class PhoneNumberMixin:
@@ -152,3 +158,31 @@ class OTPForm(FlaskForm):
         }
 
         self.otp.label.text = label
+
+
+class SetPasswordForm(FlaskForm):
+    password = PasswordField(
+        label="Select A Strong Password",
+        validators=[
+            DataRequired(),
+            Length(
+                min=3,
+                message="Password must be at least 3 characters long",
+            ),
+        ],
+    )
+
+    # confirm_password = PasswordField(
+    #     "Confirm Password",
+    #     validators=[
+    #         DataRequired(),
+    #         EqualTo(
+    #             "password",
+    #             message="Passwords must match.",
+    #         ),
+    #     ],
+    # )
+
+    submit = SubmitField(
+        label="Register Here",
+    )

@@ -105,17 +105,27 @@ class RegistrationService:
             phone=phone,
         )
 
-        existing_user = self._user_repository.exists_by_email(
+        existing_user = self._user_repository.get_by_email(
             email=validated_email_id,
         )
 
         if existing_user:
-            x = RegistrationStartingResult(
-                status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
-                next_step=AfterRegistrationNextStep.ENTER_PASSWORD,
-                identity=identity_obj,
-            )
-            return x
+
+            if existing_user.hashed_password:
+                x = RegistrationStartingResult(
+                    status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
+                    next_step=AfterRegistrationNextStep.LOGIN_WITH_PASSWORD,
+                    identity=identity_obj,
+                )
+                return x
+
+            else:
+                x = RegistrationStartingResult(
+                    status=RegistrationStatus.EMAIL_ALREADY_REGISTERED,
+                    next_step=AfterRegistrationNextStep.LOGIN_WITH_OTP,
+                    identity=identity_obj,
+                )
+                return x
 
         otp_send = send_otp_to_email(
             email_id=validated_email_id,
@@ -297,4 +307,3 @@ class RegistrationService:
             hashed_password=hashed_password,
         )
         return user
-

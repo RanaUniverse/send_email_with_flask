@@ -82,7 +82,7 @@ def handle_registration_result(
                 )
             )
 
-        case AfterRegistrationNextStep.ENTER_PASSWORD:
+        case AfterRegistrationNextStep.LOGIN_WITH_PASSWORD:
             set_identity_key_in_session(
                 key=IdentitySessionKey.LOGIN_PENDING,
                 email_value=identity.email,
@@ -92,6 +92,23 @@ def handle_registration_result(
             return redirect(
                 url_for(
                     "auth_bp.login",
+                )
+            )
+
+        case AfterRegistrationNextStep.LOGIN_WITH_OTP:
+            set_identity_key_in_session(
+                key=IdentitySessionKey.LOGIN_PENDING,
+                email_value=identity.email,
+                phone_value=identity.phone,
+            )
+            # later in time of login with password i need check phone number
+            flash(
+                message=f"You Have Not Any Password You Must Need to use OTP Login",
+                category=FlashCategory.SECONDARY,
+            )
+            return redirect(
+                url_for(
+                    "auth_bp.login_with_otp",
                 )
             )
 

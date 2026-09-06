@@ -20,9 +20,10 @@ class RegistrationStatus(StrEnum):
 
 
 class AfterRegistrationNextStep(StrEnum):
-    ENTER_PASSWORD = "enter_password"
     VERIFY_OTP = "verify_otp"
     SHOW_ERROR = "show_error"
+    LOGIN_WITH_PASSWORD = "enter_password"
+    LOGIN_WITH_OTP = "login_with_otp"
 
 
 class RegistrationOTPStatus(StrEnum):

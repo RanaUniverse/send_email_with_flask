@@ -91,7 +91,7 @@ def handle_registration_result(
             # later in time of login with password i need check phone number
             return redirect(
                 url_for(
-                    "auth_bp.login_with_password",
+                    "auth_bp.login",
                 )
             )
 

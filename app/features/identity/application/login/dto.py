@@ -32,6 +32,7 @@ class LoginIdentity:
 class LoginResult(BaseModel):
     status: LoginStatus
     identity: LoginIdentity | None = None
+    full_name: str | None = None
 
 
 class LoginOTPResult(BaseModel):

@@ -330,7 +330,11 @@ def login(
         else:
             flash(
                 message="Wrong Credentials",
-                category="warning",
+                category=FlashCategory.WARNING,
+            )
+            flash(
+                message="Please Login With OTP if you Don't Remember the password",
+                category=FlashCategory.PRIMARY,
             )
             return (
                 render_template(
@@ -344,6 +348,78 @@ def login(
         template_name_or_list="auth/login.html",
         form=form,
     )
+
+
+# @auth_bp.route(
+#     rule="/login-with-password",
+#     methods=["GET", "POST"],
+# )
+# def login_with_password(
+#     login_service: LoginServiceDep,
+# ):
+#     """
+#     This will take the email id and ask for the password to enter
+
+#     Currently this is for coming from register
+
+#     I will make this workable with login routes goodly and logically
+#     """
+
+#     email = get_identity_email_from_session(
+#         IdentitySessionKey.LOGIN_PENDING,
+#     )
+
+#     if email is None:
+#         flash(
+#             "Please Enter your email and password to login",
+#             "warning",
+#         )
+#         return redirect(
+#             url_for(
+#                 "auth_bp.login",
+#             )
+#         )
+
+#     form = LoginForm()
+
+#     if form.validate_on_submit():  # type: ignore
+#         password = form.password.data or ""
+#         user_obj = login_service.check_authentication(
+#             email=email,
+#             password=password,
+#         )
+
+#         if user_obj:
+#             login_user(
+#                 user=user_obj,
+#             )
+#             pop_key_from_session(
+#                 key=IdentitySessionKey.REGISTER_PENDING,
+#             )
+#             pop_key_from_session(
+#                 key=IdentitySessionKey.LOGIN_PENDING,
+#             )
+#             flash(
+#                 "Login Successfull",
+#                 "success",
+#             )
+
+#             return redirect(
+#                 url_for(
+#                     "general_bp.home_page",
+#                 )
+#             )
+
+#         flash(
+#             "wrong Password",
+#             "warning",
+#         )
+
+#     return render_template(
+#         "auth/login_with_password.html",
+#         form=form,
+#         email=email,
+#     )
 
 
 @auth_bp.route(
@@ -405,8 +481,10 @@ def login_with_otp(
                 email_value=validated_email,
             )
 
+            f_name = result.full_name or "User"
+
             flash(
-                message="📧 Login code sent! Check your email to continue.",
+                message=f"Hello {f_name} 📧 Login code sent! Check your email to continue.",
                 category=FlashCategory.SUCCESS,
             )
 
@@ -536,7 +614,7 @@ def verify_login_otp(
     )
 
 
-@auth_bp.route(rule="/resend-registration-otp", methods=["POST"])
+@auth_bp.route(rule="/resend-login-otp", methods=["POST"])
 def resend_login_otp():
     """
     Here i need to decide if the otp sending will done now or not
@@ -554,78 +632,6 @@ def resend_login_otp():
         url_for(
             "auth_bp.verify_login_otp",
         )
-    )
-
-
-@auth_bp.route(
-    rule="/login-with-password",
-    methods=["GET", "POST"],
-)
-def login_with_password(
-    login_service: LoginServiceDep,
-):
-    """
-    This will take the email id and ask for the password to enter
-
-    Currently this is for coming from register
-
-    I will make this workable with login routes goodly and logically
-    """
-
-    email = get_identity_email_from_session(
-        IdentitySessionKey.LOGIN_PENDING,
-    )
-
-    if email is None:
-        flash(
-            "Please Enter your email and password to login",
-            "warning",
-        )
-        return redirect(
-            url_for(
-                "auth_bp.login",
-            )
-        )
-
-    form = LoginForm()
-
-    if form.validate_on_submit():  # type: ignore
-        password = form.password.data or ""
-        user_obj = login_service.check_authentication(
-            email=email,
-            password=password,
-        )
-
-        if user_obj:
-            login_user(
-                user=user_obj,
-            )
-            pop_key_from_session(
-                key=IdentitySessionKey.REGISTER_PENDING,
-            )
-            pop_key_from_session(
-                key=IdentitySessionKey.LOGIN_PENDING,
-            )
-            flash(
-                "Login Successfull",
-                "success",
-            )
-
-            return redirect(
-                url_for(
-                    "general_bp.home_page",
-                )
-            )
-
-        flash(
-            "wrong Password",
-            "warning",
-        )
-
-    return render_template(
-        "auth/login_with_password.html",
-        form=form,
-        email=email,
     )
 
 

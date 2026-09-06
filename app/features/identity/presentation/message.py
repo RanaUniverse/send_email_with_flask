@@ -37,8 +37,8 @@ def registration_to_flash(
             category=FlashCategory.SUCCESS,
         ),
         RegistrationStatus.EMAIL_ALREADY_REGISTERED: PresentationMessageFlask(
-            message="📧 This email is already registered. Please log in "
-            "with your password instead.",
+            message="📧 This email is already registered. Please log in using your "
+            "password or choose the OTP login option instead.",
             category=FlashCategory.PRIMARY,
         ),
         RegistrationStatus.EMAIL_BLOCKED: PresentationMessageFlask(

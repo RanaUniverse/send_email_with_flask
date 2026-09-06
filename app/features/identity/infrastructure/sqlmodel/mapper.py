@@ -17,9 +17,15 @@ def to_domain(
     userclass i will make here
     """
 
+    full_name = (
+        " ".join(name for name in (model_obj.first_name, model_obj.last_name) if name)
+        or None
+    )
+
     obj = UserDomain(
         id_=model_obj.id_,
         email=model_obj.email,
+        full_name=full_name,
         hashed_password=model_obj.hashed_password,
         is_active=model_obj.is_active,
         is_verified=model_obj.is_verified,

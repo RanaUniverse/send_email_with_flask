@@ -74,10 +74,10 @@ class LoginService:
             email=validated_email_id,
         )
 
-        existing_user = self._user_repository.exists_by_email(
+        existing_user = self._user_repository.get_by_email(
             email=validated_email_id,
         )
-        if not existing_user:
+        if existing_user is None:
             x = LoginResult(
                 status=LoginStatus.NO_ACCOUNT,
             )
@@ -94,6 +94,7 @@ class LoginService:
                 x = LoginResult(
                     status=LoginStatus.OTP_SENT,
                     identity=identity_obj,
+                    full_name=existing_user.full_name,
                 )
                 return x
 

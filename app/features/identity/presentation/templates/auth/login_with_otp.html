@@ -57,25 +57,42 @@ Page for starting email OTP login.
                     <div class="d-grid">
 
                         <button type="submit" class="btn btn-primary btn-lg">
-                            📧 Send Login Code
+                            📧 Get Login Code
                         </button>
 
                     </div>
 
                 </form>
+                <!-- Alternative Login -->
+                <div class="text-center my-4">
+
+                    <div class="d-flex align-items-center">
+
+                        <hr class="flex-grow-1">
+
+                        <span class="mx-3 text-muted small">
+                            OR
+                        </span>
+
+                        <hr class="flex-grow-1">
+
+                    </div>
+
+                </div>
 
 
-                <!-- Password Login -->
-                <div class="text-center mt-4">
 
-                    <a href="{{ url_for('auth_bp.login') }}" class="text-decoration-none">
+
+                <div class="d-grid">
+
+
+                    <a href="{{ url_for('auth_bp.login') }}" class="btn btn-outline-primary">
                         🔐 Login with Password
                     </a>
 
                 </div>
 
 
-                <!-- Register -->
                 <div class="text-center mt-4 pt-3 border-top">
 
                     <p class="text-muted mb-1">

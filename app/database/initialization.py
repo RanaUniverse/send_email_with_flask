@@ -5,6 +5,8 @@ This will create the database tables and so on
 so here first i will import all the tables first
 
 i need to call this fun at startup later i will use alembic
+
+I will not use this rather i will use Alembic not this
 """
 
 from sqlmodel import SQLModel

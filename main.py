@@ -32,11 +32,11 @@ from app.shared.otp.runtime_validation import validate_all_otp_config
 
 # i need to execute this so that the user_loader will be register
 from app.features.identity.presentation import authentication  # type: ignore
-from app.database.initialization import create_db_and_tables
 
-create_db_and_tables()
+# from app.database.initialization import create_db_and_tables
 
-# later i need to keep a way to know if this upper things are ok to use or not?
+# create_db_and_tables()
+# i will now call the alembic to do this database makeup before run this
 
 
 def create_app() -> DIFlask:

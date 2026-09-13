@@ -28,3 +28,9 @@ def home_page():
     return render_template(
         template_name_or_list="general/index.html",
     )
+
+
+@general_bp.route(rule="/h")
+@general_bp.route(rule="/health")
+def healthcheck():
+    return {"status": "ok"}, 200

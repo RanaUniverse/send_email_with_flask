@@ -107,6 +107,9 @@ class RedisSettings(BaseModel):
     username: str | None = None
     password: SecretStr | None = None
 
+    # If provided, this takes priority over host/port/etc.
+    url: str | None = None
+
 
 class DatabaseSettings(BaseModel):
     """

@@ -18,18 +18,24 @@ else:
     password_value = None
 
 
-id_pass_credential_obj = redis.UsernamePasswordCredentialProvider(
-    username=settings.redis.username,
-    password=password_value,
-)
+if settings.redis.url is not None:
+    redis_client = redis.from_url(
+        settings.redis.url,
+        decode_responses=True,
+    )
 
-redis_client = redis.Redis(
-    host=settings.redis.host,
-    db=settings.redis.db,
-    port=settings.redis.port,
-    decode_responses=True,
-    credential_provider=id_pass_credential_obj,
-)
+else:
+    id_pass_credential_obj = redis.UsernamePasswordCredentialProvider(
+        username=settings.redis.username,
+        password=password_value,
+    )
+    redis_client = redis.Redis(
+        host=settings.redis.host,
+        db=settings.redis.db,
+        port=settings.redis.port,
+        decode_responses=True,
+        credential_provider=id_pass_credential_obj,
+    )
 
 
 def validate_redis_connection() -> None:

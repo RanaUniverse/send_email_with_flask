@@ -48,6 +48,7 @@ class MailAddressSettings(BaseModel):
     in different case i will keep those here
     """
 
+    # Thsi from should be match in the coresponding provider
     from_email_default: EmailStr
 
     reply_to_default: EmailStr | None = Field(default=None, repr=False)

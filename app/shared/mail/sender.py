@@ -137,10 +137,15 @@ class SMTPMailSender:
 
         except smtplib.SMTPException as e:
             raise EmailSendError(
-                "Unable to connect to email server",
+                f"SMTP error: {e}",
+            ) from e
+
+        except (OSError, TimeoutError) as e:
+            raise EmailSendError(
+                f"SMTP connection error: {e}",
             ) from e
 
         except Exception as e:
             raise EmailSendError(
-                "Different Problem",
+                f"Unexpected email error: {e}",
             ) from e

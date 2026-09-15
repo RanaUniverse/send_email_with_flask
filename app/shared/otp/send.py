@@ -10,6 +10,9 @@ Later i will do email dispatcher so that my routes will
 not wait for the email has send successfully or not
 """
 
+from datetime import datetime
+
+
 from pydantic import EmailStr
 
 
@@ -32,6 +35,10 @@ from .interfaces.storage import OTPStorage
 class OTPSendService:
     """
     For Now OTP is just send over Email
+    The otp will send over email,
+    This will take the things and then execute
+    will send the mail to the user
+
     Not over other Sender way, i will think later about those
     """
 
@@ -88,9 +95,14 @@ class OTPSendService:
             purpose=purpose,
         )
 
+        # otp = self._generator.generate(
+        #     length=otp_policy_obj.length,
+        # )
+        print(f"OTP Is Generating At {datetime.now()}...")
         otp = self._generator.generate(
             length=otp_policy_obj.length,
         )
+        print("AFTER GENERATOR->", otp)
 
         self._storage.save_otp(
             identifier=identifier,

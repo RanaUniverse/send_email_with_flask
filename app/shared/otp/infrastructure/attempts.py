@@ -146,6 +146,7 @@ class LocalOTPAttemptTracker:
         pass
 
     def start(
+        self,
         *,
         identifier: str,
         purpose: OTPPurpose,

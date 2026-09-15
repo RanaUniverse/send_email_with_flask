@@ -10,6 +10,7 @@ import string
 
 
 from ..interfaces.generator import OTPGenerator  # type: ignore
+from app.config import settings
 
 
 class LocalTestingOTPGenerator:
@@ -23,7 +24,15 @@ class LocalTestingOTPGenerator:
     ) -> str:
         if length <= 0:
             raise ValueError("OTP length must be greater than zero.")
-        return "123456"
+
+        test_otp = settings.otp.test_otp
+
+        if length > len(test_otp):
+            raise ValueError(
+                f"Local testing OTP supports maximum length " f"{len(test_otp)}."
+            )
+
+        return test_otp[:length]
 
 
 class OTPNumberGenerator:

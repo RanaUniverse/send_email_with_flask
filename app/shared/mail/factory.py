@@ -8,7 +8,8 @@ to send mail to other user.
 
 from app.config import settings
 from .config import local_config, email_config
-from .sender import EmailSender, LocalMailSender, SMTPMailSender
+from .interfaces.sender import EmailSender
+from .infrastructure.sender import LocalMailSender, SMTPMailSender
 
 
 def get_mail_sender() -> EmailSender:

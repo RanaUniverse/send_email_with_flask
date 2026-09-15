@@ -1,36 +1,26 @@
 """
-app/shared/mail/sender.py
+app/shared/mail/infrastructure/sender.py
 
-
+Here i will make the real implimentations of how to send the
+mails
 """
 
 from email.message import EmailMessage
 
-
 import smtplib
 import ssl
 
-from typing import Protocol
+
 from pydantic import EmailStr
 
-from .models import (
-    SMTPConfig,
-    AuthSMTPConfig,
-    EmailMessageData,
-)
-from .email_builder import build_email_message
-from .exceptions import EmailSendError
+
+from ..email_builder import build_email_message
+from ..exceptions import EmailSendError
+from ..interfaces.sender import EmailSender
+from ..models import SMTPConfig, EmailMessageData, AuthSMTPConfig
 
 
-class EmailSender(Protocol):
-    def send_mail(
-        self,
-        email_msg: EmailMessageData,
-    ) -> None:
-        pass
-
-
-class LocalMailSender:
+class LocalMailSender(EmailSender):
     def __init__(
         self,
         mail_config: SMTPConfig,
@@ -56,7 +46,7 @@ class LocalMailSender:
             )
 
 
-class SMTPMailSender:
+class SMTPMailSender(EmailSender):
 
     def __init__(
         self,

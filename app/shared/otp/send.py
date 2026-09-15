@@ -19,7 +19,7 @@ from pydantic import EmailStr
 from app.config import settings
 
 from .enums import OTPPurpose, OTPSendStatus
-from ..mail.sender import EmailSender
+from ..mail.interfaces.sender import EmailSender
 from ..mail.models import EmailMessageData
 from .models import OTPSendResult
 from .render import render_otp_email

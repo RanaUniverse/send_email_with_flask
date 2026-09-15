@@ -11,8 +11,8 @@ Like how it will call otp generate, verifications and so on
 from pydantic import EmailStr
 
 
-from app.shared.otp.send import OTPSendService
-from app.shared.otp.verify import OTPVerifyService
+from app.shared.otp.services.send import OTPSendService
+from app.shared.otp.services.verify import OTPVerifyService
 
 from app.shared.otp.models import (
     OTPSendResult,

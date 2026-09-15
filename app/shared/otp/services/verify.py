@@ -8,12 +8,12 @@ given by the user
 from pydantic import EmailStr
 
 
-from .enums import OTPPurpose, OTPVerifyStatus
-from .models import OTPVerifyResult
-from .policy import get_otp_policy_obj
+from ..enums import OTPPurpose, OTPVerifyStatus
+from ..models import OTPVerifyResult
+from ..policy import get_otp_policy_obj
 
-from .interfaces.storage import OTPStorage
-from .interfaces.attempts import OTPAttemptTracker
+from ..interfaces.storage import OTPStorage
+from ..interfaces.attempts import OTPAttemptTracker
 
 
 class OTPVerifyService:

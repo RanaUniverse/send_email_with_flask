@@ -11,6 +11,8 @@ from redis import Redis
 from ..enums import OTPPurpose
 from ..interfaces.storage import OTPStorage  # type: ignore
 
+from app.config import settings
+
 
 class RedisOTPStorage:
     """
@@ -109,7 +111,6 @@ class RedisOTPStorage:
 
 
 class LocalTestingOTPStorage:
-    TEST_OTP = "112233"
 
     def save_otp(
         self,
@@ -134,7 +135,7 @@ class LocalTestingOTPStorage:
         This will try to read the otp from my backend
         whcih was store in some place
         """
-        return self.TEST_OTP
+        return settings.otp.test_otp[:4]
 
     def delete_otp(
         self,

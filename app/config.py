@@ -93,7 +93,7 @@ class OTPSettings(BaseModel):
     backend: Literal[
         "local",
         "redis",
-    ]
+    ] = "local"
     test_otp: str = "98765432"
 
 
@@ -183,7 +183,7 @@ class Settings(BaseSettings):
 
     app: AppSettings
     mail: MailSettings = Field(repr=False)
-    otp: OTPSettings
+    otp: OTPSettings = Field(default_factory=OTPSettings)
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings
 

@@ -18,7 +18,7 @@ from .interfaces.storage import OTPStorage
 from .infrastructure.attempts import LocalOTPAttemptTracker, RedisAttemptTracker
 from .infrastructure.blocklist import LocalInMemoryBlocklist, RedisBlocklist
 from .infrastructure.cooldown import LocalCooldown, RedisCooldown
-from .infrastructure.generator import OTPNumberGenerator
+from .infrastructure.generator import OTPNumberGenerator, LocalTestingOTPGenerator
 from .infrastructure.storage import LocalTestingOTPStorage, RedisOTPStorage
 
 
@@ -26,7 +26,10 @@ from ..redis.client import redis_client, validate_redis_connection
 
 
 def create_otp_generator() -> OTPGenerator:
-    return OTPNumberGenerator()
+    if settings.otp.backend == "redis":
+        return OTPNumberGenerator()
+
+    return LocalTestingOTPGenerator()
 
 
 def create_otp_attempt_tracker() -> OTPAttemptTracker:

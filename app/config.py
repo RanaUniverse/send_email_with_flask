@@ -94,6 +94,7 @@ class OTPSettings(BaseModel):
         "local",
         "redis",
     ]
+    test_otp: str = "98765432"
 
 
 class RedisSettings(BaseModel):

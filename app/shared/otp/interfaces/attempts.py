@@ -10,7 +10,7 @@ from typing import Protocol
 from pydantic import EmailStr
 
 
-from ..enums import OTPPurpose
+from ..domain.enums import OTPPurpose
 
 
 class OTPAttemptTracker(Protocol):

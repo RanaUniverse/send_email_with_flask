@@ -8,9 +8,9 @@ given by the user
 from pydantic import EmailStr
 
 
-from ..enums import OTPPurpose, OTPVerifyStatus
-from ..models import OTPVerifyResult
-from ..policy import get_otp_policy_obj
+from ..domain.enums import OTPPurpose, OTPVerifyStatus
+from ..domain.models import OTPVerifyResult
+from ..domain.policy import get_otp_policy_obj
 
 from ..interfaces.storage import OTPStorage
 from ..interfaces.attempts import OTPAttemptTracker

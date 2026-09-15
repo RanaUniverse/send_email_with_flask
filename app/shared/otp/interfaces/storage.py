@@ -7,7 +7,7 @@ This is for OTP Storage Things will be here
 from typing import Protocol
 
 
-from ..enums import OTPPurpose
+from ..domain.enums import OTPPurpose
 
 
 class OTPStorage(Protocol):

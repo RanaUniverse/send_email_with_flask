@@ -14,7 +14,7 @@ from pydantic import EmailStr
 from app.shared.otp.services.send import OTPSendService
 from app.shared.otp.services.verify import OTPVerifyService
 
-from app.shared.otp.models import (
+from app.shared.otp.domain.models import (
     OTPSendResult,
     OTPVerifyResult,
 )
@@ -25,7 +25,7 @@ from app.shared.otp.factory import (
 
 from app.shared.mail.factory import mail_sender_obj
 
-from app.shared.otp.enums import (
+from app.shared.otp.domain.enums import (
     OTPPurpose,
 )
 

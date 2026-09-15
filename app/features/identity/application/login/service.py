@@ -6,7 +6,7 @@ Here i will write my business logics like how the login works and so on
 
 from pydantic import EmailStr
 
-from app.shared.otp.enums import OTPPurpose
+from app.shared.otp.domain.enums import OTPPurpose
 
 from ...domain.entities.user import UserDomain
 from ...domain.repositories.user_repository import UserRepository

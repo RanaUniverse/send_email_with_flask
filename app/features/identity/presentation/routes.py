@@ -38,8 +38,8 @@ from ..presentation.authentication import FlaskLoginUser
 from .registration_response import handle_registration_result
 
 
-from app.shared.otp.policy import get_otp_policy_obj
-from app.shared.otp.enums import OTPPurpose
+from app.shared.otp.domain.policy import get_otp_policy_obj
+from app.shared.otp.domain.enums import OTPPurpose
 
 
 from app.shared.session.enums import IdentitySessionKey

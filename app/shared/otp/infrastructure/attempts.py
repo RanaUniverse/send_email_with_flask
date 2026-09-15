@@ -10,7 +10,7 @@ from redis import Redis
 
 from ..interfaces.attempts import OTPAttemptTracker  # type: ignore
 
-from ..enums import OTPPurpose
+from ..domain.enums import OTPPurpose
 
 
 class RedisAttemptTracker:

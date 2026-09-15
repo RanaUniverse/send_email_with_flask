@@ -8,7 +8,7 @@ it maybe redis, db or somethigns
 from redis import Redis
 
 
-from ..enums import OTPPurpose
+from ..domain.enums import OTPPurpose
 from ..interfaces.storage import OTPStorage  # type: ignore
 
 from app.config import settings

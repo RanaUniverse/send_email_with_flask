@@ -8,9 +8,9 @@ data or message will shows to the user.
 from flask import render_template
 
 
-from .enums import OTPPurpose
+from .domain.enums import OTPPurpose
 
-from .models import OTPEmailPresentation, RenderedOTPEmail
+from .domain.models import OTPEmailPresentation, RenderedOTPEmail
 
 OTP_EMAIL_PRESENTATIONS: dict[OTPPurpose, OTPEmailPresentation] = {
     OTPPurpose.REGISTER: OTPEmailPresentation(

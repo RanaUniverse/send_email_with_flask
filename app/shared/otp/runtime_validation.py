@@ -4,7 +4,7 @@ app/shared/otp/runtime_validation.py
 This is where my validation will works of otp realted thigns
 """
 
-from .policy import validate_otp_policies
+from .domain.policy import validate_otp_policies
 from .render import validate_otp_email_presentation
 
 from app.config import settings

@@ -18,12 +18,12 @@ from pydantic import EmailStr
 
 from app.config import settings
 
-from ..enums import OTPPurpose, OTPSendStatus
+from ..domain.enums import OTPPurpose, OTPSendStatus
 from ...mail.interfaces.sender import EmailSender
 from ...mail.models import EmailMessageData
-from ..models import OTPSendResult
+from ..domain.models import OTPSendResult
 from ..render import render_otp_email
-from ..policy import get_otp_policy_obj
+from ..domain.policy import get_otp_policy_obj
 
 from ..interfaces.attempts import OTPAttemptTracker
 from ..interfaces.blocklist import BlockList

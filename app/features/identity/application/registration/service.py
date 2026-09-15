@@ -10,7 +10,7 @@ start, resend_otp have duplicaion i need to remove those
 from pydantic import EmailStr
 
 
-from app.shared.otp.enums import (
+from app.shared.otp.domain.enums import (
     OTPPurpose,
     OTPSendStatus,
     OTPVerifyStatus,

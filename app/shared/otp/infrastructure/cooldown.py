@@ -9,7 +9,7 @@ from redis import Redis
 
 
 from ..interfaces.cooldown import OTPCooldown  # type: ignore
-from ..enums import OTPPurpose
+from ..domain.enums import OTPPurpose
 
 
 class RedisCooldown:
